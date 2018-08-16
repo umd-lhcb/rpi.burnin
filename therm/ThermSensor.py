@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Authors: Jorge Ramirez, Yipeng Sun
-# Last Change: Wed Aug 15, 2018 at 06:19 PM -0400
+# Last Change: Thu Aug 16, 2018 at 01:16 AM -0400
 
 import logging
 import sys
@@ -14,11 +14,11 @@ logger = logging.getLogger(__name__)
 
 class ThermSensor(Thread):
     def __init__(self, stop_event, *args,
-                 sensor=None, display_name=None, interval=5,
+                 sensor=None, displayName=None, interval=5,
                  **kwargs):
         self.stop_event = stop_event
         self.sensor = sensor
-        self.display_name = display_name
+        self.displayName = displayName
         self.interval = interval
 
         super().__init__(*args, **kwargs)
@@ -28,7 +28,7 @@ class ThermSensor(Thread):
 
         while not self.stop_event.wait(self.interval):
             data = str(self.get())
-            self.print_therm(self.sensor.stem, self.display_name, data)
+            self.print_therm(self.sensor.stem, self.displayName, data)
 
     def get(self):
         with self.sensor.open() as f:
@@ -44,13 +44,13 @@ class ThermSensor(Thread):
 
     def announce(self):
         logger.info("Starting: read from {}, with a display name of {}".format(
-            self.sensor.stem, self.display_name
+            self.sensor.stem, self.displayName
         ))
 
     @staticmethod
-    def print_therm(sensor_name, display_name, data):
+    def print_therm(sensor_name, displayName, data):
         print(("Sensor {} (from file {}) detects {}".format(
-            display_name, sensor_name, data)))
+            displayName, sensor_name, data)))
 
 
 ###########
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     for i in range(len(sensor_path)):
         sensor_list.append(
             ThermSensor(stop_event,
-                        sensor=sensor_path[i], display_name=str(i),
+                        sensor=sensor_path[i], displayName=str(i),
                         interval=int(sys.argv[1])
                         ))
 
