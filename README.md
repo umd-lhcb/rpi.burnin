@@ -3,6 +3,14 @@ This library provides an interface from the Rasperberry Pi GPIO to burn-in
 related actvitities.
 
 
+## Dependencies
+The following Python packages need to be installed:
+```
+RPi.GPIO
+hidapi
+```
+
+
 ## `therm`
 `ThermSensor.py` is a script that reads the output files made by the DS18B20
 thermometers and runs a multithreaded process with each thread dedicated to
