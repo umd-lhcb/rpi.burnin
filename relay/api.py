@@ -1,8 +1,67 @@
 #!/usr/bin/env python
 #
 # Authors: Yipeng Sun
-# Last Change: Tue Nov 06, 2018 at 12:24 PM -0500
+# Last Change: Wed Nov 07, 2018 at 04:38 PM -0500
 
-# These are found from 'lsusb', then convert the hex numbers to dec.
-# For each entry, it is formatted as: (vendor_id, product_id)
-RELAY_ID = ((5824, 1503))
+import hid
+
+# These are found from 'lsusb'; it is formatted as: (vendor_id, product_id)
+RELAY_ID = (0x16c0, 0x05df)
+
+
+#################################
+# Operations on multiple relays #
+#################################
+
+def print_all(device_id=RELAY_ID):
+    for d in hid.enumerate(*device_id):
+        print(d)
+
+
+def get_all_device_paths(device_id=RELAY_ID):
+    return [d['path'] for d in hid.enumerate(*device_id)]
+
+
+################################
+# Operations on a single relay #
+################################
+
+def get_device_alias(path):
+    dev = hid.device()
+
+    dev.open_path(path)
+    alias = chr_list(dev.get_feature_report(0, 9)[1:6])
+    dev.close()
+
+    return alias
+
+
+def set_device_alias(path, alias):
+    if len(alias) > 5:
+        raise ValueError('The length of the alias should not exceed 5.')
+    else:
+        dev = hid.device()
+
+        dev.open_path(path)
+        alias = chr_list(dev.get_feature_report(0, 9)[1:6])
+        dev.close()
+
+
+###########
+# Helpers #
+###########
+
+def ord_str(string):
+    return [ord(char) for char in string]
+
+
+def chr_list(list_of_int):
+    chars = [chr_quiet(n) for n in list_of_int]
+    return ''.join(chars)
+
+
+def chr_quiet(n):
+    if n < 32:
+        return ''
+    else:
+        return chr(n)
