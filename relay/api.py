@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Authors: Yipeng Sun
-# Last Change: Wed Nov 07, 2018 at 05:00 PM -0500
+# Last Change: Wed Nov 07, 2018 at 05:05 PM -0500
 
 import hid
 
@@ -47,11 +47,7 @@ def set_device_alias(path, alias):
         cmd += ord_str(alias)
         cmd += [0] * (9-len(cmd))
 
-        dev = hid.device()
-
-        dev.open_path(path)
-        dev.send_feature_report(cmd)
-        dev.close()
+        send_cmd(path, cmd)
 
 
 def get_relay_number(path):
@@ -62,6 +58,22 @@ def get_relay_number(path):
     dev.close()
 
     return num
+
+
+def set_relay_state(path, idx, state=ON):
+    cmd = [0]
+    cmd.append(state)
+    cmd.append(idx)
+    cmd += [0] * (9-len(cmd))
+
+    send_cmd(path, cmd)
+
+
+def send_cmd(path, cmd):
+    dev = hid.device()
+    dev.open_path(path)
+    dev.send_feature_report(cmd)
+    dev.close()
 
 
 ###########
