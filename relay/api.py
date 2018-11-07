@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Authors: Yipeng Sun
-# Last Change: Wed Nov 07, 2018 at 04:57 PM -0500
+# Last Change: Wed Nov 07, 2018 at 05:00 PM -0500
 
 import hid
 
@@ -52,6 +52,16 @@ def set_device_alias(path, alias):
         dev.open_path(path)
         dev.send_feature_report(cmd)
         dev.close()
+
+
+def get_relay_number(path):
+    dev = hid.device()
+
+    dev.open_path(path)
+    num = int(dev.get_product_string()[-1])
+    dev.close()
+
+    return num
 
 
 ###########
