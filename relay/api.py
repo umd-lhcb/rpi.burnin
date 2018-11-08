@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Authors: Yipeng Sun
-# Last Change: Wed Nov 07, 2018 at 05:05 PM -0500
+# Last Change: Wed Nov 07, 2018 at 09:48 PM -0500
 
 import hid
 
@@ -30,13 +30,7 @@ def get_all_device_paths(device_id=RELAY_ID):
 ################################
 
 def get_device_alias(path):
-    dev = hid.device()
-
-    dev.open_path(path)
-    alias = chr_list(dev.get_feature_report(0, 9)[1:6])
-    dev.close()
-
-    return alias
+    return chr_list(get_feature_report(path)[1:6])
 
 
 def set_device_alias(path, alias):
@@ -69,11 +63,12 @@ def set_relay_state(path, idx, state=ON):
     send_cmd(path, cmd)
 
 
-def send_cmd(path, cmd):
-    dev = hid.device()
-    dev.open_path(path)
-    dev.send_feature_report(cmd)
-    dev.close()
+def get_relay_state(path, num_of_relays=2):
+    state_of_all_chs = get_feature_report(path)[-1]
+    if num_of_relays == 2:
+        return get_relay_state_two_chs(state_of_all_chs)
+    else:
+        return 'Unimplemented for relay with {} channels'.format(num_of_relays)
 
 
 ###########
@@ -94,3 +89,29 @@ def chr_quiet(n):
         return ''
     else:
         return chr(n)
+
+
+def send_cmd(path, cmd):
+    dev = hid.device()
+    dev.open_path(path)
+    dev.send_feature_report(cmd)
+    dev.close()
+
+
+def get_feature_report(path, lower_bd=0, upper_bd=9):
+    dev = hid.device()
+    dev.open_path(path)
+    msg = dev.get_feature_report(lower_bd, upper_bd)
+    dev.close()
+
+    return msg
+
+
+def get_relay_state_two_chs(state):
+    state_map = {
+        0: {'CH1': 'OFF', 'CH2': 'OFF'},
+        1: {'CH1': 'ON',  'CH2': 'OFF'},
+        2: {'CH1': 'OFF', 'CH2': 'ON'},
+        3: {'CH1': 'ON',  'CH2': 'ON'}
+    }
+    return state_map[state]
