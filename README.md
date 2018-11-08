@@ -1,6 +1,6 @@
 # rpi.burnin
 This library provides an interface from the Rasperberry Pi GPIO to burn-in
-related actvitities.
+related activities.
 
 
 ## Dependencies
@@ -54,6 +54,11 @@ Rajagopalan.
 USB relay control for ` Van Ooijen Technische Informatica` USB relay by Yipeng
 Sun. Currently only APIs are implemented, as they have not been wrapped into
 worker classes that can be used directly in the burn-in system.
+
+### Setup
+Copy the udev rule in `relay/udev_rules/50-usb-relay-dct-tech.rules` under
+`/etc/udev/rules.d/` directory, so that everyone (not just `root` user) has
+read/write access to this type of USB relays.
 
 ### Usage
 To list all USB relays that are connected to the computer, use:
