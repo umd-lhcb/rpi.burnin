@@ -48,3 +48,28 @@ Jorge Ramirez.
 ## `mux`
 Preliminary voltage read-out from prototype mux boards is implemented by Rohan
 Rajagopalan.
+
+
+## `relay`
+USB relay control for ` Van Ooijen Technische Informatica` USB relay by Yipeng
+Sun. Currently only APIs are implemented, as they have not been wrapped into
+worker classes that can be used directly in the burn-in system.
+
+### Usage
+To list all USB relays that are connected to the computer, use:
+```
+>>> p = get_all_device_paths()
+[b'0001:0013:00']
+```
+
+To read channel states (currently only support 2 channel relays):
+```
+>>> get_relay_state(p[0])
+{'CH1': 'OFF', 'CH2': 'OFF'}
+```
+
+Each channel can be turned on/off:
+```
+>>> set_relay_state(p[0], 1, ON)
+>>> set_relay_state(p[0], 2, OFF)
+```
