@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Authors: Jorge Ramirez, Yipeng Sun
-# Last Change: Thu Aug 16, 2018 at 01:16 AM -0400
+# Last Change: Thu Jan 17, 2019 at 11:55 AM -0500
 
 import logging
 import sys
@@ -20,6 +20,7 @@ class ThermSensor(Thread):
         self.sensor = sensor
         self.displayName = displayName
         self.interval = interval
+        self.false_alarm_list = []
 
         super().__init__(*args, **kwargs)
 
@@ -37,7 +38,7 @@ class ThermSensor(Thread):
             temp_output = contents[1].find('t=')
             temp_string = contents[1].strip()[temp_output + 2:]
 
-        return int(temp_string) / 1000  # add decimal point to data
+        self.thermal_readout_guard(temp_string)
 
     def cleanup(self):
         self.join()
@@ -46,6 +47,24 @@ class ThermSensor(Thread):
         logger.info("Starting: read from {}, with a display name of {}".format(
             self.sensor.stem, self.displayName
         ))
+
+    def thermal_readout_guard(self, temp_string):
+        temp = int(temp_string) / 1000  # add decimal point to data
+
+        # Ignore it for the first two consecutive '85.0'
+        if temp == 85.0:
+            self.false_alarm_list.append(temp)
+            if len(self.false_alarm_list) > 2:
+                # We have received more than 2 consecutive '85.0', which means
+                # that we should spit out '85.0' faithfully.
+                pass
+            else:
+                # Suppress '85.0' on the basis that this is likely a fluke.
+                temp = None
+        else:
+            self.false_alarm_list = []
+
+        return temp
 
     @staticmethod
     def print_therm(sensor_name, displayName, data):
