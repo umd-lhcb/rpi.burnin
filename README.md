@@ -56,6 +56,9 @@ Rajagopalan.
 USB relay control for ` Van Ooijen Technische Informatica` USB relay by Yipeng
 Sun. Currently only APIs are implemented, as they have not been wrapped into
 worker classes that can be used directly in the burn-in system.
+Valves functionality has been confirmed by Jorge Ramirez. 
+
+
 
 ### Setup
 Copy the udev rule in `relay/udev_rules/50-usb-relay-dct-tech.rules` under
@@ -63,7 +66,13 @@ Copy the udev rule in `relay/udev_rules/50-usb-relay-dct-tech.rules` under
 read/write access to this type of USB relays.
 
 ### Usage
-To list all USB relays that are connected to the computer, use:
+To initialize the script, use the command while in the ```relay``` directory:
+```
+python -i api.py
+```
+
+#### functionalities
+To list all USB relays that are connected to the computer, run the python script use:
 ```
 >>> p = get_all_device_paths()
 [b'0001:0013:00']
@@ -80,3 +89,11 @@ Each channel can be turned on/off:
 >>> set_relay_state(p[0], 1, ON)
 >>> set_relay_state(p[0], 2, OFF)
 ```
+
+To test, hook up a valve as shown in LHCb-Valve-Diagram.png. 
+Call the TestRelay(x) method, where x is the number of seconds between each ON/OFF switch. 
+
+```
+>>>TestRelay(12)
+```
+Will initiate a loop where there is a 12 second pause between ON/OFF switches. Use Ctrl+C to exit.
