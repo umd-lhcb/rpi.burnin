@@ -65,14 +65,15 @@ Copy the udev rule in `relay/udev_rules/50-usb-relay-dct-tech.rules` under
 `/etc/udev/rules.d/` directory, so that everyone (not just `root` user) has
 read/write access to this type of USB relays.
 
+
 ### Usage
 To initialize the script, use the command while in the ```relay``` directory:
 ```
 python -i api.py
 ```
 
-#### functionalities
-To list all USB relays that are connected to the computer, run the python script use:
+### Functionalities
+To list all USB relays that are connected to the computer, use:
 ```
 >>> p = get_all_device_paths()
 [b'0001:0013:00']
