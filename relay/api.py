@@ -4,6 +4,7 @@
 # Last Change: Wed Nov 07, 2018 at 09:48 PM -0500
 
 import hid
+import time
 
 # These are found from 'lsusb'; it is formatted as: (vendor_id, product_id)
 RELAY_ID = (0x16c0, 0x05df)
@@ -115,3 +116,37 @@ def get_relay_state_two_chs(state):
         3: {'CH1': 'ON',  'CH2': 'ON'}
     }
     return state_map[state]
+
+
+def TestRelay(delay=15):
+    test = get_all_device_paths()  # default seconds to pause btwn cycles
+    print("Starting configuration:")
+    print(get_relay_state(test[0]))
+    print(get_all_device_paths())
+    set_relay_state(test[0], 1, OFF)  # ensure it is turned off
+    if delay == 15:
+        print("\nBeginning loop. Default 30 second cycles. Ctrl+C to stop.\n")
+    else:
+        print("\nBeginning loop. Custom", delay*2, "second cycles. Ctrl+C to stop.\n")
+
+    cycles = 0  # counter
+    try:
+        while True:
+            print("Turning Relay On")
+            set_relay_state(test[0], 1, ON)
+            time.sleep(delay)
+
+            print("Turning Relay Off")
+            set_relay_state(test[0], 1, OFF)
+            time.sleep(delay)
+            cycles += 1
+            if cycles == 1:
+                print(cycles, "cycle completed.\n")
+            else:
+                print(cycles, "cycles completed.\n")
+
+    except KeyboardInterrupt:
+        print("\nPreparing for graceful shutdown...")
+
+    set_relay_state(test[0], 1, OFF)  # ensure it is turned off
+    return "Test Concluded"
