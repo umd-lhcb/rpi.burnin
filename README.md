@@ -1,5 +1,5 @@
 # rpi.burnin
-This library provides an interface from the Rasperberry Pi GPIO to burn-in
+This library provides an interface from the Raspberry Pi 3 Model B v1.2 GPIO to burn-in
 related activities.
 
 
@@ -18,20 +18,37 @@ reading and outputting the data values from one thermometer.  Written by Jorge
 Ramirez, improvements by Yipeng Sun.
 
 ### Setup
-In `/boot/config.txt`, add the following line:
+In the raspberry pi's `/boot/config.txt`, add the following line:
 ```
 dtoverlay=w1-gpio,pullup=1
 ```
 
-### Usage
-To set a delay on recording, run script in terminal with an integer to specify
-the delay in seconds:
+The thermistors are wired in parallel by connecting their GND to the VDD pins, 
+and then both to shared ground (Pin 6). The DQ pin carries the data signal into 
+the 1-Wire [(aka BCM4 or Pin7)](https://pinout.xyz/pinout/1_wire) interface. 
+A pulldown resistor is included by connecting the data line to the 3.3v pin (pin 1) 
+as required by the 1-wire interface.
+
+![alt text](https://github.com/umd-lhcb/rpi.burnin/blob/jorge/res/thermistor-wiring.png "Thermistor Wiring Diagram")
+
+Our lab has streamlined the process of having several dozen thermistors. 
+Each thermistor has the GND pin wrapped around the VDD pin and soldered 
+and all three pins are covered in gel for rigidity. A breakout board was 
+produced with one rail for each thermistor's GND connection, and one rail 
+for each thermistor's data line. Both rails have a wire that allow connection 
+to their corresponding pin (GND -> pin 6, Data -> pin 7) and a 4.7k resistor 
+was soldered onto the data rail with a wire to connect to the 3.3v pin (pin 1).
+
+On our setup, the blue wire corresponds to the data line, the red wire is 
+the pulldown resistor's 3.3v connection, and the black wire is ground.
+
+### Manual Usage
+The ThermSensor.py script will automatically loop and output the temperature
+values for every connected thermistor. Run the script with an integer value 
+to specify the delay between each readout in seconds:
 ```
 python ThermSensor.py 4
 ```
-will have a 4 second delay between each round of recording.
-
-
 
 ## `water`
 `WaterAlarm.py` is a script that uses the LS2600 leak sensor in order to monitor
@@ -65,12 +82,23 @@ Copy the udev rule in `relay/udev_rules/50-usb-relay-dct-tech.rules` under
 `/etc/udev/rules.d/` directory, so that everyone (not just `root` user) has
 read/write access to this type of USB relays.
 
+The CP100 Rain Bird Solenoid Valve is connected to the NO (normally open) terminal of the 
+USB Relay so that water will only flow when the Relay turns on and the switch is flipped.
+Tests showed that the reverse-current created by the solenoid's voltage spike was enough to 
+damage the relay and force it to reset. A 60V 5.5A diode was included in the circuit to allow
+a back channel for the reverse-current to dissipate.  
+
+![alt text](https://github.com/umd-lhcb/rpi.burnin/blob/jorge/res/lhcb-valve-diagram.png "Single Valve Diagram")
+
+Multiple valves can be connected, each valve can share the common connection to the +
+terminal of the power supply, however each valve requires its own diode and NO relay terminal.
 
 ### Usage
-To initialize the script, use the command while in the ```relay``` directory:
+To initialize the script, run the command:
 ```
 python -i api.py
 ```
+Enter any of the commands below to utilize the api.
 
 ### Functionalities
 To list all USB relays that are connected to the computer, use:
