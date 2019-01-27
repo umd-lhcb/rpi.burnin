@@ -35,10 +35,9 @@ class ThermSensor(Thread):
         with self.sensor.open() as f:
             contents = f.readlines()
             # extract raw data into variable "temp_string"
-            temp_output = contents[1].find('t=')
-            temp_string = contents[1].strip()[temp_output + 2:]
-
-        self.thermal_readout_guard(temp_string)
+            data_pos = contents[1].find('t=')
+            temp_string = contents[1].strip()[data_pos + 2:]
+        return self.thermal_readout_guard(temp_string)
 
     def cleanup(self):
         self.join()
@@ -61,6 +60,7 @@ class ThermSensor(Thread):
             else:
                 # Suppress '85.0' on the basis that this is likely a fluke.
                 temp = None
+
         else:
             self.false_alarm_list = []
 
