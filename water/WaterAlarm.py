@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Authors: Jorge Ramirez Ortiz, Yipeng Sun
-# Last Change: Wed Aug 15, 2018 at 06:09 PM -0400
+# Last Change: Sun Jan 27, 2019 at 02:17 AM -0500
 
 
 import RPi.GPIO as GPIO
@@ -12,11 +12,11 @@ from threading import Thread, Event
 
 class WaterAlarm(Thread):
     def __init__(self, stop_event, *args,
-                 ch=9, interval=0.01, alarm_threshold=2, **kwargs):
+                 ch=9, interval=0.01, alarmThreshold=2, **kwargs):
         self.stop_event = stop_event
         self.ch = ch
         self.interval = interval
-        self.alarm_threshold = alarm_threshold
+        self.alarmThreshold = alarmThreshold
 
         # 'leak_counter' variable can be used to guard against false alarms.
         #
@@ -46,7 +46,7 @@ class WaterAlarm(Thread):
         while not self.stop_event.wait(self.interval):
             if self.read_channel() == 1:
                 self.leak_counter += 1
-                if self.leak_counter >= self.alarm_threshold:
+                if self.leak_counter >= self.alarmThreshold:
                     self.alarm()
 
     def cleanup(self):
