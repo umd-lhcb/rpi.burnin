@@ -98,8 +98,7 @@ def list_all_sensors(**kwargs):
     for sensor in sensor_list:
         print("Detected the following sensor: {}".format(sensor.stem))
 
-
-if __name__ == '__main__':
+def get_all_sensors():
     # detect sensors and assign threads
     sensor_path = detect_sensors()
     sensor_list = []
@@ -112,7 +111,10 @@ if __name__ == '__main__':
                         sensor=sensor_path[i], displayName=str(i),
                         interval=int(sys.argv[1])
                         ))
+    return sensor_list
 
+if __name__ == '__main__':
+    sensor_list = get_all_sensors()
     # start new threads once all have been initialized
     for sensor in sensor_list:
         sensor.start()
