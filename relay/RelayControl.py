@@ -8,20 +8,8 @@ import logging
 
 from threading import Thread, Event
 from RelayAPI import *
-# the inserted path must be changed to folder containing ThermSensor.py
-sys.path.insert(0, '/home/student/data/derek/rpi.burnin/therm/')
-import ThermSensor as therm
-
-# To run:
-#   give 3 numbers
-#   first is interval in seconds between temp measurments
-#   second is the amount +/- of deviation that is accepted
-#   third is target temperature in Celsius
 
 logger = logging.getLogger(__name__)
-
-# create thermistor list
-sensor_list = therm.get_all_sensors()
 
 class RelayControl(Thread):
     def __init__(self, stop_event, *args,
@@ -37,11 +25,8 @@ class RelayControl(Thread):
 
     def run(self):
         self.announce()
-        self.hyst = float(sys.argv[2])
-        target_temp = float(sys.argv[3])
-        
-        self.control(target_temp)
-        #self.sim(target_temp)
+        self.control()
+
 
     def get(self):
         get_relay_state(self.relay)
@@ -50,40 +35,22 @@ class RelayControl(Thread):
         set_relay_state(self.relay, channel, status)
 
 
-    def control(self, target_temp):
-        # input target temp and attempts to keep within hyst
-        # each thermistor correlates to its own relay
-         while not self.stop_event.wait(self.interval):
-            for i in range(len(sensor_list)):
-                sensor = sensor_list[i]
-                meas_temp = sensor.get()
-                print(meas_temp)
-                if meas_temp > target_temp + self.hyst:
-                    self.set(i + 1, ON)
-                elif meas_temp < target_temp - self.hyst:
-                    self.set(i + 1, OFF)
-
-    def sim(self, target):
-        # simulates cooling and heating with relay actions
-        measTemp = 25
-        relay_state = 0
+    def control(self):
         while not self.stop_event.wait(self.interval):
-            if relay_state == 0:
-                delTemp = 0.5
-            else:
-                delTemp = -0.5
-            measTemp += delTemp
-            print(measTemp)
-            if measTemp < target - self.hyst:
-                relay_state = 0
-                print("relay off")
-            elif measTemp > target + self.hyst:
-                relay_state = 1
-                print("relay on")
+            self.set(1, ON)
+            print("relay 1 on")
+            time.sleep(self.interval)
+            self.set(2, ON)
+            print("relay 2 on")
+            time.sleep(self.interval)
+            self.set(1, OFF)
+            self.set(2, OFF)
+            print("both off")
 
     def cleanup(self):
-        for i in range(len(sensor_list)):
+        for i in range(len(controller_list)):
             self.set(i + 1, OFF)
+            self.set(i + 2, OFF)
         self.join()
 
     def announce(self):
