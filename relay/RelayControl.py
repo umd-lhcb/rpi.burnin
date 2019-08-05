@@ -11,6 +11,8 @@ from RelayAPI import *
 
 logger = logging.getLogger(__name__)
 
+# run with one argument to be used as interval
+
 class RelayControl(Thread):
     def __init__(self, stop_event, *args,
                  relay=None, displayName=None, interval=5, hyst=1,
