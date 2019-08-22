@@ -7,11 +7,19 @@ import sys
 import logging
 
 from threading import Thread, Event
-from RelayAPI import *
+from relay.RelayAPI import *
+
+
+# To run:
+#   give 3 numbers
+#   first is interval in seconds between temp measurments
+#   second is the amount +/- of deviation that is accepted
+#   third is target temperature in Celsius
 
 logger = logging.getLogger(__name__)
 
-# run with one argument to be used as interval
+# create thermistor list
+
 
 class RelayControl(Thread):
     def __init__(self, stop_event, *args,
@@ -27,32 +35,17 @@ class RelayControl(Thread):
 
     def run(self):
         self.announce()
-        self.control()
-
+        self.set(1, ON)
 
     def get(self):
         get_relay_state(self.relay)
 
     def set(self, channel, status):
         set_relay_state(self.relay, channel, status)
-
-
-    def control(self):
-        while not self.stop_event.wait(self.interval):
-            self.set(1, ON)
-            print("relay 1 on")
-            time.sleep(self.interval)
-            self.set(2, ON)
-            print("relay 2 on")
-            time.sleep(self.interval)
-            self.set(1, OFF)
-            self.set(2, OFF)
-            print("both off")
-
+        
     def cleanup(self):
-        for i in range(len(controller_list)):
+        for i in range(2):
             self.set(i + 1, OFF)
-            self.set(i + 2, OFF)
         self.join()
 
     def announce(self):
@@ -66,8 +59,7 @@ if __name__ == '__main__':
     relay_path = get_all_device_paths()
     controller_list = []
     stop_event = Event()
-    
-   
+
     # create new threads
     for i in range(len(relay_path)):
         controller_list.append(

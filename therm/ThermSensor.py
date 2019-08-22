@@ -27,9 +27,9 @@ class ThermSensor(Thread):
     def run(self):
         self.announce()
 
-        while not self.stop_event.wait(self.interval):
-            data = str(self.get())
-            self.print_therm(self.sensor.stem, self.displayName, data)
+        #while not self.stop_event.wait(self.interval):
+        #    data = str(self.get())
+        #    self.print_therm(self.sensor.stem, self.displayName, data)
 
     def get(self):
         with self.sensor.open() as f:
@@ -37,7 +37,9 @@ class ThermSensor(Thread):
             # extract raw data into variable "temp_string"
             data_pos = contents[1].find('t=')
             temp_string = contents[1].strip()[data_pos + 2:]
-        return self.thermal_readout_guard(temp_string)
+        temp = self.thermal_readout_guard(temp_string)
+        self.print_therm(self.sensor.stem, self.displayName, temp)
+        return temp
 
     def cleanup(self):
         self.join()
