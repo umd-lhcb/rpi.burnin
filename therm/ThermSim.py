@@ -16,10 +16,11 @@ lowerBound = float(sys.argv[2])
 upperBound = float(sys.argv[3])
 
 class ThermSensor(Thread):
-    def __init__(self, stop_event, *args,
+    def __init__(self, stop_event, Global_Queue, *args,
                  sensor=None, displayName=None, interval=5, temp=25., 
-                 relayState=False,
+                 relayState=False, 
                  **kwargs):
+        self.Global_Queue = Global_Queue
         self.stop_event = stop_event
         self.sensor = sensor
         self.displayName = displayName
@@ -33,13 +34,13 @@ class ThermSensor(Thread):
     def run(self):
         self.announce()
 
-        #while not self.stop_event.wait(self.interval):
-        #    data = str(self.get())
-        #    self.print_therm(self.sensor, self.displayName, data)
+        while not self.stop_event.wait(self.interval):
+            data = str(self.get())
+            self.print_therm(self.sensor, self.displayName, data)
+            Global_Queue.put(int(data))
 
     def get(self):
         self.newTemp()
-        self.print_therm(self.sensor, self.displayName, self.temp)
         return self.temp
 
     def newTemp(self):

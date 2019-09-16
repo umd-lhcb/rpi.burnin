@@ -1,42 +1,43 @@
 import sys
 
 from threading import Thread, Event
+import queue
 
 from therm import ThermSim as ther
 from relay import RelayControl
 
 lowerBound = int(sys.argv[2])
 upperBound = int(sys.argv[3])
+Global_Queue = queue.Queue()
 
-class control(Thread):
-    def __init__(self, stop_event, thermistor, relay, channel,
-            *args, interval=5, chState=False, **kwargs):
+class Control(Thread):
+    def __init__(self, stop_event, relay,
+            *args, chState=False, **kwargs):
         self.stop_event = stop_event
-        self. thermistor = thermistor
         self.relay = relay
-        self.channel = channel
-        self.interval = interval
         self.chState = chState
 
         super().__init__(*args, **kwargs)
 
     def run(self):
-        self.thermistor.start()
-        #self.relay.start()
-
-        while not self.stop_event.wait(self.interval):
-            data = self.thermistor.get()
+        while not self.stop_event:
+            data = Global_Queue.get()
             if data > upperBound:
-                self.relay.set(self.channel, RelayControl.ON)
+                for i in range(len(self.relay)):
+                    self.relay[i].set(1, RelayControl.ON)
+                    self.relay[i].set(2, RelayControl.ON)
                 self.chState = not self.chState
             if data < lowerBound:
-                self.relay.set(self.channel, RelayControl.OFF)
+                for i in range(len(self.relay)):
+                    self.relay[i].set(1, RelayControl.OFF)
+                    self.relay[i].set(2, RelayControl.OFF)
                 self.chState = not self.chState
-
+            Global_Queue.task_done()
 
     def cleanup(self):
-        self.relay.set(self.channel, RelayControl.OFF)
-        self.thermistor.cleanup()
+        for i in range(len(self.relay)):
+            self.relay[i].set(1, RelayControl.OFF)
+            self.relay[i].set(2, RelayControl.OFF)
         self.join()
 
 
@@ -48,7 +49,7 @@ if __name__ == '__main__':
     # create new threads
     for i in range(len(sensor_path)):
         sensor_list.append(
-            ther.ThermSensor(stop_event,
+            ther.ThermSensor(stop_event, Global_Queue,
                         sensor=sensor_path[i], displayName=str(i),
                         interval=int(sys.argv[1])))
 
@@ -63,14 +64,12 @@ if __name__ == '__main__':
                     relay=relay_path[i], displayName=str(i), 
                     interval=int(sys.argv[1])))
 
-    pair_list = []
-    for i in range(len(sensor_list)):
-        pair_list.append(
-                control(stop_event, 
-                    sensor_list[i], relay_list[0], i+1,  
-                    interval = int(sys.argv[1])))
-    for pair in pair_list:
-        pair.start()
+    #starts thermistor threads, begin readout
+    for sensor in sensor_list:
+        sensor.start()
+
+    controller = Control(stop_event, relay_list)
+    controller.start()
 
     try:
         while True:
@@ -79,5 +78,4 @@ if __name__ == '__main__':
         print("Preparing for 'graceful' shutdown...")
 
     stop_event.set()
-    for pair in pair_list:
-        pair.cleanup()
+    controller.cleanup()

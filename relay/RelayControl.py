@@ -23,19 +23,17 @@ logger = logging.getLogger(__name__)
 
 class RelayControl(Thread):
     def __init__(self, stop_event, *args,
-                 relay=None, displayName=None, interval=5, hyst=1,
+                 relay=None, displayName=None, interval=5, 
                  **kwargs):
         self.stop_event = stop_event
         self.relay = relay
         self.displayName = displayName
         self.interval = interval
-        self.hyst = hyst
 
         super().__init__(*args, **kwargs)
 
     def run(self):
         self.announce()
-        self.set(1, ON)
 
     def get(self):
         get_relay_state(self.relay)
