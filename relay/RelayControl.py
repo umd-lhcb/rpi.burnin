@@ -34,7 +34,7 @@ class RelayControl(Thread):
 
     def run(self):
         self.announce()
-
+    
     def get(self):
         get_relay_state(self.relay)
 

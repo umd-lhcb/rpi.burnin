@@ -14,11 +14,11 @@ logger = logging.getLogger(__name__)
 
 lowerBound = float(sys.argv[2])
 upperBound = float(sys.argv[3])
+RelayState = False
 
 class ThermSensor(Thread):
     def __init__(self, stop_event, Global_Queue, *args,
                  sensor=None, displayName=None, interval=5, temp=25., 
-                 relayState=False, 
                  **kwargs):
         self.Global_Queue = Global_Queue
         self.stop_event = stop_event
@@ -26,7 +26,6 @@ class ThermSensor(Thread):
         self.displayName = displayName
         self.interval = interval
         self.temp = temp
-        self.relayState = relayState
         self.false_alarm_list = []
 
         super().__init__(*args, **kwargs)
@@ -35,22 +34,25 @@ class ThermSensor(Thread):
         self.announce()
 
         while not self.stop_event.wait(self.interval):
-            data = str(self.get())
+            data = self.get()
             self.print_therm(self.sensor, self.displayName, data)
-            Global_Queue.put(int(data))
+            self.Global_Queue.put(data)
 
     def get(self):
         self.newTemp()
         return self.temp
 
     def newTemp(self):
-        if self.relayState == False:
+        global RelayState
+        if RelayState == False:
             self.temp += (0.2 + round(random.uniform(-0.2, 0.2), 1))
         else:
             self.temp -= (0.2 + round(random.uniform(-0.2, 0.2), 1))
 
-        if self.temp > upperBound or self.temp < lowerBound:
-            self.relayState = not self.relayState
+        if self.temp > upperBound:
+            RelayState = True
+        elif self.temp < lowerBound:
+            RelayState = False
 
 
 

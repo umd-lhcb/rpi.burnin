@@ -20,25 +20,28 @@ class Control(Thread):
         super().__init__(*args, **kwargs)
 
     def run(self):
-        while not self.stop_event:
+        while True: 
             data = Global_Queue.get()
+            if data == None:
+                Global_Queue.task_done()
+                return
             if data > upperBound:
+                print("data>upper")
                 for i in range(len(self.relay)):
                     self.relay[i].set(1, RelayControl.ON)
                     self.relay[i].set(2, RelayControl.ON)
-                self.chState = not self.chState
+                self.chState = True
             if data < lowerBound:
+                print("data<lower")
                 for i in range(len(self.relay)):
                     self.relay[i].set(1, RelayControl.OFF)
                     self.relay[i].set(2, RelayControl.OFF)
-                self.chState = not self.chState
+                self.chState = True 
             Global_Queue.task_done()
 
     def cleanup(self):
-        for i in range(len(self.relay)):
-            self.relay[i].set(1, RelayControl.OFF)
-            self.relay[i].set(2, RelayControl.OFF)
         self.join()
+        Global_Queue.join()
 
 
 if __name__ == '__main__':
@@ -67,7 +70,8 @@ if __name__ == '__main__':
     #starts thermistor threads, begin readout
     for sensor in sensor_list:
         sensor.start()
-
+    for relay in relay_list:
+        relay.start()
     controller = Control(stop_event, relay_list)
     controller.start()
 
@@ -76,6 +80,13 @@ if __name__ == '__main__':
             pass
     except KeyboardInterrupt:
         print("Preparing for 'graceful' shutdown...")
-
+    
     stop_event.set()
+    for sensor in sensor_list:
+        sensor.stop_event.set()
+        sensor.cleanup()
+    for relay in relay_list:
+        relay.stop_event.set()
+        relay.cleanup()
+    Global_Queue.put(None)
     controller.cleanup()
