@@ -1,67 +1,64 @@
 #!/usr/bin/env python
 #
-# Authors: Yipeng Sun
-# Last Change: Wed Jul 10, 2019 at 01:26 PM -0400
+# Authors: Yipeng Sun, Derek Colby
+# Last Change: Mon Sep 30, 2019 at 12:43 PM -0400
 
 import sys
 import logging
 
 from threading import Thread, Event
-from relay.RelayAPI import *
 
+# from relay.RelayAPI import *
+import relay.RelayAPI as api
 
-# To run:
-#   give 3 numbers
-#   first is interval in seconds between temp measurments
-#   second is the amount +/- of deviation that is accepted
-#   third is target temperature in Celsius
-
+ON = 0xFF
+OFF = 0xFD
 logger = logging.getLogger(__name__)
-
-# create thermistor list
 
 
 class RelayControl(Thread):
-    def __init__(self, stop_event, *args,
-                 relay=None, displayName=None, interval=5, 
-                 **kwargs):
+    def __init__(
+        self, stop_event, *args, relay=None, displayName=None, **kwargs
+    ):
         self.stop_event = stop_event
         self.relay = relay
         self.displayName = displayName
-        self.interval = interval
 
         super().__init__(*args, **kwargs)
 
     def run(self):
         self.announce()
-    
+
     def get(self):
-        get_relay_state(self.relay)
+        api.get_relay_state(self.relay)
 
     def set(self, channel, status):
-        set_relay_state(self.relay, channel, status)
-        
+        api.set_relay_state(self.relay, channel, status)
+
     def cleanup(self):
         for i in range(2):
             self.set(i + 1, OFF)
         self.join()
 
     def announce(self):
-        logger.info("Starting: read from {}, with a display name of {}".format(
-            self.relay, self.displayName
-        ))
+        logger.info(
+            "Starting: relay control from {}, with a display name of {}".format(
+                self.relay, self.displayName
+            )
+        )
 
 
-if __name__ == '__main__': 
+if __name__ == "__main__":
     # detect sensors and assign threads
-    relay_path = get_all_device_paths()
+    relay_path = api.get_all_device_paths()
     controller_list = []
     stop_event = Event()
 
     # create new threads
     for i in range(len(relay_path)):
         controller_list.append(
-            RelayControl(stop_event, relay=relay_path[i], displayName=str(i), interval=int(sys.argv[1])))
+            RelayControl(stop_event, relay=relay_path[i], displayName=str(i))
+        )
 
     # start new threads once all have been initialized
     for controller in controller_list:

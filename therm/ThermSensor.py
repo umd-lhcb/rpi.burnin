@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
-# Authors: Jorge Ramirez, Yipeng Sun
-# Last Change: Thu Jan 17, 2019 at 11:55 AM -0500
+# Authors: Jorge Ramirez, Yipeng Sun, Derek Colby
+# Last Change: Mon Sep 30, 2019 at 12:54 PM -0400
 
 import logging
 import sys
@@ -13,10 +13,18 @@ logger = logging.getLogger(__name__)
 
 
 class ThermSensor(Thread):
-    def __init__(self, stop_event, *args,
-                 sensor=None, displayName=None, interval=5,
-                 **kwargs):
+    def __init__(
+        self,
+        stop_event,
+        globalQueue,
+        *args,
+        sensor=None,
+        displayName=None,
+        interval=5,
+        **kwargs
+    ):
         self.stop_event = stop_event
+        self.globalQueue = globalQueue
         self.sensor = sensor
         self.displayName = displayName
         self.interval = interval
@@ -27,16 +35,17 @@ class ThermSensor(Thread):
     def run(self):
         self.announce()
 
-        #while not self.stop_event.wait(self.interval):
-        #    data = str(self.get())
-        #    self.print_therm(self.sensor.stem, self.displayName, data)
+        while not self.stop_event.wait(self.interval):
+            data = self.get()
+            self.print_therm(self.sensor.stem, self.displayName, data)
+            self.globalQueue.put(data)
 
     def get(self):
         with self.sensor.open() as f:
             contents = f.readlines()
             # extract raw data into variable "temp_string"
-            data_pos = contents[1].find('t=')
-            temp_string = contents[1].strip()[data_pos + 2:]
+            data_pos = contents[1].find("t=")
+            temp_string = contents[1].strip()[data_pos + 2 :]
         temp = self.thermal_readout_guard(temp_string)
         self.print_therm(self.sensor.stem, self.displayName, temp)
         return temp
@@ -45,9 +54,11 @@ class ThermSensor(Thread):
         self.join()
 
     def announce(self):
-        logger.info("Starting: read from {}, with a display name of {}".format(
-            self.sensor.stem, self.displayName
-        ))
+        logger.info(
+            "Starting: read from {}, with a display name of {}".format(
+                self.sensor.stem, self.displayName
+            )
+        )
 
     def thermal_readout_guard(self, temp_string):
         temp = int(temp_string) / 1000  # add decimal point to data
@@ -70,26 +81,34 @@ class ThermSensor(Thread):
 
     @staticmethod
     def print_therm(sensor_name, displayName, data):
-        print(("Sensor {} (from file {}) detects {}".format(
-            displayName, sensor_name, data)))
+        print(
+            (
+                "Sensor {} (from file {}) detects {}".format(
+                    displayName, sensor_name, data
+                )
+            )
+        )
 
 
 ###########
 # Helpers #
 ###########
 
-def detect_sensors(sensor_dir="/sys/bus/w1/devices",
-                   sensor_name_prefix='28-00000',
-                   sensor_file_name='w1_slave'):
+
+def detect_sensors(
+    sensor_dir="/sys/bus/w1/devices",
+    sensor_name_prefix="28-00000",
+    sensor_file_name="w1_slave",
+):
     scan_dir = Path(sensor_dir)  # set directory to be scanned
     sensor_list = []
 
-    print('Detecting sensors and adding to list...')
+    print("Detecting sensors and adding to list...")
     for item in scan_dir.iterdir():
         if item.is_dir() and item.stem[:8] == sensor_name_prefix:
             sensor = item / Path(sensor_file_name)
             sensor_list.append(sensor)
-            print('sensor {} appended.'.format(item.stem))
+            print("sensor {} appended.".format(item.stem))
 
     return sensor_list
 
@@ -100,6 +119,7 @@ def list_all_sensors(**kwargs):
     for sensor in sensor_list:
         print("Detected the following sensor: {}".format(sensor.stem))
 
+
 def get_all_sensors():
     # detect sensors and assign threads
     sensor_path = detect_sensors()
@@ -109,13 +129,17 @@ def get_all_sensors():
     # create new threads
     for i in range(len(sensor_path)):
         sensor_list.append(
-            ThermSensor(stop_event,
-                        sensor=sensor_path[i], displayName=str(i),
-                        interval=int(sys.argv[1])
-                        ))
+            ThermSensor(
+                stop_event,
+                sensor=sensor_path[i],
+                displayName=str(i),
+                interval=int(sys.argv[1]),
+            )
+        )
     return sensor_list
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     sensor_list = get_all_sensors()
     # start new threads once all have been initialized
     for sensor in sensor_list:

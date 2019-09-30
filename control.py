@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+#
+# Authors: Derek Colby
+# Last Change: Mon Sep 30, 2019 at 12:47 PM -0400
+
 import sys
 
 from threading import Thread, Event
@@ -8,11 +13,11 @@ from relay import RelayControl
 
 lowerBound = int(sys.argv[2])
 upperBound = int(sys.argv[3])
-Global_Queue = queue.Queue()
+globalQueue = queue.Queue()
+
 
 class Control(Thread):
-    def __init__(self, stop_event, relay,
-            *args, chState=False, **kwargs):
+    def __init__(self, stop_event, relay, *args, chState=False, **kwargs):
         self.stop_event = stop_event
         self.relay = relay
         self.chState = chState
@@ -20,10 +25,10 @@ class Control(Thread):
         super().__init__(*args, **kwargs)
 
     def run(self):
-        while True: 
-            data = Global_Queue.get()
+        while True:
+            data = globalQueue.get()
             if data == None:
-                Global_Queue.task_done()
+                globalQueue.task_done()
                 return
             if data > upperBound:
                 print("data>upper")
@@ -36,15 +41,15 @@ class Control(Thread):
                 for i in range(len(self.relay)):
                     self.relay[i].set(1, RelayControl.OFF)
                     self.relay[i].set(2, RelayControl.OFF)
-                self.chState = True 
-            Global_Queue.task_done()
+                self.chState = False
+            globalQueue.task_done()
 
     def cleanup(self):
         self.join()
-        Global_Queue.join()
+        globalQueue.join()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # detect thermistors and assign threads
     sensor_path = ther.detect_sensors()
     sensor_list = []
@@ -52,9 +57,14 @@ if __name__ == '__main__':
     # create new threads
     for i in range(len(sensor_path)):
         sensor_list.append(
-            ther.ThermSensor(stop_event, Global_Queue,
-                        sensor=sensor_path[i], displayName=str(i),
-                        interval=int(sys.argv[1])))
+            ther.ThermSensor(
+                stop_event,
+                globalQueue,
+                sensor=sensor_path[i],
+                displayName=str(i),
+                interval=int(sys.argv[1]),
+            )
+        )
 
     # detect relays and assign threads
     relay_path = RelayControl.get_all_device_paths()
@@ -63,11 +73,12 @@ if __name__ == '__main__':
     # create new threads
     for i in range(len(relay_path)):
         relay_list.append(
-                RelayControl.RelayControl(stop_event, 
-                    relay=relay_path[i], displayName=str(i), 
-                    interval=int(sys.argv[1])))
+            RelayControl.RelayControl(
+                stop_event, relay=relay_path[i], displayName=str(i)
+            )
+        )
 
-    #starts thermistor threads, begin readout
+    # starts thermistor threads, begin readout
     for sensor in sensor_list:
         sensor.start()
     for relay in relay_list:
@@ -80,7 +91,7 @@ if __name__ == '__main__':
             pass
     except KeyboardInterrupt:
         print("Preparing for 'graceful' shutdown...")
-    
+
     stop_event.set()
     for sensor in sensor_list:
         sensor.stop_event.set()
@@ -88,5 +99,5 @@ if __name__ == '__main__':
     for relay in relay_list:
         relay.stop_event.set()
         relay.cleanup()
-    Global_Queue.put(None)
+    globalQueue.put(None)
     controller.cleanup()
