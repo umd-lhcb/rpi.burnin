@@ -37,7 +37,6 @@ class ThermSensor(Thread):
 
         while not self.stop_event.wait(self.interval):
             data = self.get()
-            self.print_therm(self.sensor.stem, self.displayName, data)
             self.globalQueue.put(data)
 
     def get(self):

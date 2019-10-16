@@ -11,8 +11,9 @@ from threading import Thread, Event
 
 
 class WaterAlarm(Thread):
-    def __init__(self, stop_event, *args,
-                 ch=9, interval=0.01, alarmThreshold=2, **kwargs):
+    def __init__(
+        self, stop_event, *args, ch=9, interval=0.01, alarmThreshold=2, **kwargs
+    ):
         self.stop_event = stop_event
         self.ch = ch
         self.interval = interval
@@ -57,13 +58,13 @@ class WaterAlarm(Thread):
         return GPIO.input(self.ch)
 
     def alarm(self):
-        print('Leak!!!')
+        print("Leak!!!")
 
 
-if __name__ == '__main__':  # ensure that script is being run from terminal
+if __name__ == "__main__":  # ensure that script is being run from terminal
     stop_event = Event()
 
-    print('Initializing water leak detector...')
+    print("Initializing water leak detector...")
     alarm = WaterAlarm(stop_event, ch=int(sys.argv[1]))
     alarm.start()
 
@@ -71,7 +72,7 @@ if __name__ == '__main__':  # ensure that script is being run from terminal
         while True:
             pass
     except KeyboardInterrupt:
-        print('Preparing for graceful shutdown...')
+        print("Preparing for graceful shutdown...")
 
     stop_event.set()
     alarm.cleanup()
