@@ -1,15 +1,20 @@
 #!/usr/bin/env python
 #
 # Authors: Jorge Ramirez, Yipeng Sun, Derek Colby
-# Last Change: Mon Sep 30, 2019 at 12:54 PM -0400
+# Last Change: Mon Sep 30, 2019 at 12:44 PM -0400
 
 import logging
 import sys
+import random
 
 from pathlib import Path
 from threading import Thread, Event
 
 logger = logging.getLogger(__name__)
+
+lowerBound = float(sys.argv[2])
+upperBound = float(sys.argv[3])
+relayState = False
 
 
 class ThermSensor(Thread):
@@ -21,13 +26,15 @@ class ThermSensor(Thread):
         sensor=None,
         displayName=None,
         interval=5,
+        temp=25.0,
         **kwargs
     ):
-        self.stop_event = stop_event
         self.globalQueue = globalQueue
+        self.stop_event = stop_event
         self.sensor = sensor
         self.displayName = displayName
         self.interval = interval
+        self.temp = temp
         self.false_alarm_list = []
 
         super().__init__(*args, **kwargs)
@@ -37,17 +44,24 @@ class ThermSensor(Thread):
 
         while not self.stop_event.wait(self.interval):
             data = self.get()
+            self.print_therm(self.sensor, self.displayName, data)
             self.globalQueue.put(data)
 
     def get(self):
-        with self.sensor.open() as f:
-            contents = f.readlines()
-            # extract raw data into variable "temp_string"
-            data_pos = contents[1].find("t=")
-            temp_string = contents[1].strip()[data_pos + 2 :]
-        temp = self.thermal_readout_guard(temp_string)
-        self.print_therm(self.sensor.stem, self.displayName, temp)
-        return temp
+        self.newTemp()
+        return self.temp
+
+    def newTemp(self):
+        global relayState
+        if relayState == False:
+            self.temp += 0.2 + round(random.uniform(-0.2, 0.2), 1)
+        else:
+            self.temp -= 0.2 + round(random.uniform(-0.2, 0.2), 1)
+
+        if self.temp > upperBound:
+            relayState = True
+        elif self.temp < lowerBound:
+            relayState = False
 
     def cleanup(self):
         self.join()
@@ -55,28 +69,9 @@ class ThermSensor(Thread):
     def announce(self):
         logger.info(
             "Starting: read from {}, with a display name of {}".format(
-                self.sensor.stem, self.displayName
+                self.sensor, self.displayName
             )
         )
-
-    def thermal_readout_guard(self, temp_string):
-        temp = int(temp_string) / 1000  # add decimal point to data
-
-        # Ignore it for the first two consecutive '85.0'
-        if temp == 85.0:
-            self.false_alarm_list.append(temp)
-            if len(self.false_alarm_list) > 2:
-                # We have received more than 2 consecutive '85.0', which means
-                # that we should spit out '85.0' faithfully.
-                pass
-            else:
-                # Suppress '85.0' on the basis that this is likely a fluke.
-                temp = None
-
-        else:
-            self.false_alarm_list = []
-
-        return temp
 
     @staticmethod
     def print_therm(sensor_name, displayName, data):
@@ -92,34 +87,18 @@ class ThermSensor(Thread):
 ###########
 # Helpers #
 ###########
-
-
-def detect_sensors(
-    sensor_dir="/sys/bus/w1/devices",
-    sensor_name_prefix="28-00000",
-    sensor_file_name="w1_slave",
-):
-    scan_dir = Path(sensor_dir)  # set directory to be scanned
-    sensor_list = []
-
-    print("Detecting sensors and adding to list...")
-    for item in scan_dir.iterdir():
-        if item.is_dir() and item.stem[:8] == sensor_name_prefix:
-            sensor = item / Path(sensor_file_name)
-            sensor_list.append(sensor)
-            print("sensor {} appended.".format(item.stem))
-
-    return sensor_list
+def detect_sensors():
+    return ["sens1", "sens2"]
 
 
 def list_all_sensors(**kwargs):
     sensor_list = detect_sensors(**kwargs)
 
     for sensor in sensor_list:
-        print("Detected the following sensor: {}".format(sensor.stem))
+        print("Detected the following sensor: {}".format(sensor))
 
 
-def get_all_sensors():
+if __name__ == "__main__":
     # detect sensors and assign threads
     sensor_path = detect_sensors()
     sensor_list = []
@@ -135,11 +114,7 @@ def get_all_sensors():
                 interval=int(sys.argv[1]),
             )
         )
-    return sensor_list
 
-
-if __name__ == "__main__":
-    sensor_list = get_all_sensors()
     # start new threads once all have been initialized
     for sensor in sensor_list:
         sensor.start()

@@ -70,7 +70,7 @@ Rajagopalan.
 
 
 ## `relay`
-USB relay control for ` Van Ooijen Technische Informatica` USB relay by Yipeng
+USB relay control for `Van Ooijen Technische Informatica` USB relay by Yipeng
 Sun. Currently only APIs are implemented, as they have not been wrapped into
 worker classes that can be used directly in the burn-in system.
 Valves functionality has been confirmed by Jorge Ramirez.
@@ -94,7 +94,7 @@ terminal of the power supply, however each valve requires its own diode and NO r
 ### Usage
 To initialize the script, run the command:
 ```
-python -i api.py
+python -i RelayAPI.py
 ```
 Enter any of the commands below to utilize the api.
 
