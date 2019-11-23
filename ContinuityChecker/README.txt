@@ -6,3 +6,5 @@ ctrl-c to quit
 j at any time to select another pigtail reference map
 
 coming soon: power lines
+
+NOTE: exit in the menu does nothing. it's a default i can't remove or make more functional yet :(
