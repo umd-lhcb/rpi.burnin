@@ -82,6 +82,7 @@ except Exception:
 
 
 def loop(stdscr,n):
+    stdscr.clear()
     stdscr.timeout(1)
     curses.noecho()
     curses.cbreak()
@@ -90,9 +91,10 @@ def loop(stdscr,n):
     press = stdscr.getch()
     start_time = time.time()
     Vref=0.0
-    curses.init_pair(1,curses.COLOR_GREEN, curses.COLOR_BLACK)
-    curses.init_pair(2,curses.COLOR_YELLOW, curses.COLOR_BLACK)
-    curses.init_pair(3,curses.COLOR_RED, curses.COLOR_BLACK)
+    curses.init_pair(1,curses.COLOR_CYAN, curses.COLOR_BLACK)
+    curses.init_pair(2,curses.COLOR_GREEN, curses.COLOR_BLACK)
+    curses.init_pair(3,curses.COLOR_YELLOW, curses.COLOR_BLACK)
+    curses.init_pair(4,curses.COLOR_RED, curses.COLOR_BLACK)
     while press != ord('j'):
         this_time=time.time()
         line=2
@@ -148,7 +150,7 @@ def loop(stdscr,n):
             stdscr.addstr(0,0,time.asctime()+" ("+str.format("{0:0.1f}",1000*(time.time()-this_time))+")"+" \tVref="+str(Vref)+"V        ")
             #stdscr.addstr(line,offset,key+"\t"+f"{R:9.1f}"+" Ohm"+"\t("+str.format("{0:0.2f}",reading)+" V)            ")
             target = DSUB_pins[key][1][JP_assignments[n]]
-            color = min(3,ceil(abs(R-target)/sqrt(pow(5*sqrt(target/100),2)+pow(0.03*R,2)+49)))
+            color = min(4,ceil(abs(R-target)/sqrt(pow(5*sqrt(target/100),2)+pow(0.03*R,2)+49)))
             stdscr.addstr(line,offset,key+"\t"+f"{R:9.1f}"+" Ohm\t"+f"{target:6.1f}"+" Ohm",curses.color_pair(color))
             stdscr.refresh()
             line=line+1
@@ -159,6 +161,7 @@ def loop(stdscr,n):
         stdscr.addstr(0,0,time.asctime()+" ("+str.format("{0:0.1f}",1000*(time.time()-this_time))+")"+" \tVref="+str(Vref)+"V        ")
         stdscr.refresh()
         press=stdscr.getch()
+    stdscr.clear()
 
 def main(a):
     stdscr = curses.initscr()
