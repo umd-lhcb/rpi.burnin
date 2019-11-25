@@ -150,7 +150,7 @@ def loop(stdscr,n):
             stdscr.addstr(0,0,time.asctime()+" ("+str.format("{0:0.1f}",1000*(time.time()-this_time))+")"+" \tVref="+str(Vref)+"V        ")
             #stdscr.addstr(line,offset,key+"\t"+f"{R:9.1f}"+" Ohm"+"\t("+str.format("{0:0.2f}",reading)+" V)            ")
             target = DSUB_pins[key][1][JP_assignments[n]]
-            color = min(4,ceil(abs(R-target)/sqrt(pow(5*sqrt(target/100),2)+pow(0.03*R,2)+49)))
+            color = min(4,ceil(abs(R-target)/(0.86*sqrt(pow(5*sqrt(target/100),2)+pow(0.03*R,2)+49))))
             stdscr.addstr(line,offset,key+"\t"+f"{R:9.1f}"+" Ohm\t"+f"{target:6.1f}"+" Ohm",curses.color_pair(color))
             stdscr.refresh()
             line=line+1
@@ -179,13 +179,12 @@ def main(a):
             print("GPIO setup error")
             return
     try:
-        while True:
-            menu=CursesMenu("Select Saved JPx for Comparison")
-            for i in range(0,12,1):
-                item=FunctionItem("JP"+str(i),loop,[stdscr,i])
-                menu.append_item(item)
-            menu.start()
-            menu.join()
+        menu=CursesMenu("Select Saved JPx for Comparison")
+        for i in range(0,12,1):
+            item=FunctionItem("JP"+str(i),loop,[stdscr,i])
+            menu.append_item(item)
+        menu.start()
+        menu.join()
 
     except KeyboardInterrupt:
         pass
