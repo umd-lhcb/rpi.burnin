@@ -8,7 +8,10 @@ The following Python packages need to be installed:
 ```
 RPi.GPIO
 hidapi
+black
 ```
+
+`black` is used to format Python source code.
 
 
 ## `therm`
