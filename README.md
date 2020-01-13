@@ -1,17 +1,13 @@
 # rpi.burnin
-This library provides an interface from the Raspberry Pi 3 Model B v1.2 GPIO to burn-in
-related activities.
+This library provides an interface from the various Raspberry Pi models for
+burn-in related activities.
 
 
 ## Dependencies
-The following Python packages need to be installed:
+Install required packages with:
 ```
-RPi.GPIO
-hidapi
-black
+pip3 install --user -r ./requirements.txt
 ```
-
-`black` is used to format Python source code.
 
 
 ## Usage
