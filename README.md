@@ -14,6 +14,20 @@ black
 `black` is used to format Python source code.
 
 
+## `bin` Usage
+### `Continuity.py`
+Continuity checker for the backplane testing.
+
+Invoke with:
+```
+python3 ./bin/Continuity.py
+```
+
+* `Ctrl-C` to quit
+* `j` at any time to select another pigtail reference map
+
+
+
 ## `therm`
 `ThermSensor.py` is a script that reads the output files made by the DS18B20
 thermometers and runs a multithreaded process with each thread dedicated to

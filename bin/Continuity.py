@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 #
 # Author: Phoebe Hamilton, with base from Rohan Rajagopalan
 
@@ -36,7 +36,7 @@ except ImportError:
     GPIO=RPi.GPIO
     from fake_rpi import wrappers
     wrappers.toggle_print(False)
-    
+
 from ADCPi import ADCPi
 
 pins = [11, 12, 13, 15, 16, 18, 22, 7]
@@ -71,7 +71,7 @@ DSUB_pins = {'Group  1':[[1,12,0],[2.4e3,2.4e3,2.4e3,2.4e3,2.4e3,2.4e3]] #start 
              ,'Sense P3/JDB/E':[[0,13,0],[10,10,10,10,10,10]]
              ,'Sense P4/___/_':[[0,14,0],[10,10,10,10,10,10]]
              }
-             
+
 
 
 try:
@@ -135,7 +135,7 @@ def loop(stdscr,n):
             except ZeroDivisionError:
                 R=1e12
             if(R < 16800):
-                try:                    
+                try:
                     R=1/(1/R-1/16800.)
                 except ZeroDivisionError:
                     R=120
