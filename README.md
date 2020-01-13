@@ -14,8 +14,8 @@ black
 `black` is used to format Python source code.
 
 
-## `bin` Usage
-### `Continuity.py`
+## Usage
+### `bin/Continuity.py`
 Continuity checker for the backplane testing.
 
 Invoke with:
@@ -46,7 +46,7 @@ the 1-Wire [(aka BCM4 or Pin7)](https://pinout.xyz/pinout/1_wire) interface.
 A pulldown resistor is included by connecting the data line to the 3.3v pin (pin 1)
 as required by the 1-wire interface.
 
-![alt text](res/thermistor_wiring.png "Thermistor Wiring Diagram")
+![Thermistor wiring diagram](docs/thermistor_wiring.png)
 
 Our lab has streamlined the process of having several dozen thermistors.
 Each thermistor has the GND pin wrapped around the VDD pin and soldered
@@ -103,7 +103,7 @@ Tests showed that the reverse-current created by the solenoid's voltage spike wa
 damage the relay and force it to reset. A 60V 5.5A diode was included in the circuit to allow
 a back channel for the reverse-current to dissipate.
 
-![alt text](res/lhcb_valve_diagram.png "Single Valve Diagram")
+![Single valve diagram](docs/lhcb_valve_diagram.png)
 
 Multiple valves can be connected, each valve can share the common connection to the +
 terminal of the power supply, however each valve requires its own diode and NO relay terminal.
