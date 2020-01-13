@@ -15,6 +15,7 @@ black
 
 
 ## Usage
+
 ### `bin/Continuity.py`
 Continuity checker for the backplane testing.
 
@@ -28,13 +29,13 @@ python3 ./bin/Continuity.py
 
 
 
-## `therm`
+### `bin/ThermSensor.py`
 `ThermSensor.py` is a script that reads the output files made by the DS18B20
 thermometers and runs a multithreaded process with each thread dedicated to
 reading and outputting the data values from one thermometer.  Written by Jorge
 Ramirez, improvements by Yipeng Sun.
 
-### Setup
+#### Setup
 In the raspberry pi's `/boot/config.txt`, add the following line:
 ```
 dtoverlay=w1-gpio,pullup=1
@@ -59,7 +60,7 @@ was soldered onto the data rail with a wire to connect to the 3.3v pin (pin 1).
 On our setup, the blue wire corresponds to the data line, the red wire is
 the pulldown resistor's 3.3v connection, and the black wire is ground.
 
-### Manual Usage
+#### Manual Usage
 The `ThermSensor.py` script will automatically loop and output the temperature
 values for every connected thermistor. Run the script with an integer value
 to specify the delay between each readout in seconds:
@@ -67,7 +68,8 @@ to specify the delay between each readout in seconds:
 python ThermSensor.py 4
 ```
 
-## `water`
+
+### `bin/WaterAlarm.py`
 `WaterAlarm.py` is a script that uses the LS2600 leak sensor in order to monitor
 for leaks. If the LS2600 has both contacts in water, the sensor will close the
 circuit and then the script will sense the High and track for how long in the
@@ -76,23 +78,13 @@ variable 'leak counter'.
 Written by Jorge Ramirez, improvements by Yipeng Sun.
 
 
-## `alarm`
-Preliminary fire alarm detection by Yipeng Sun. Further improvements made by
-Jorge Ramirez.
-
-
-## `mux`
-Preliminary voltage read-out from prototype mux boards is implemented by Rohan
-Rajagopalan.
-
-
-## `relay`
+### `rpi.burnin.RelayAPI`
 USB relay control for `Van Ooijen Technische Informatica` USB relay by Yipeng
 Sun. Currently only APIs are implemented, as they have not been wrapped into
 worker classes that can be used directly in the burn-in system.
 Valves functionality has been confirmed by Jorge Ramirez.
 
-### Setup
+#### Setup
 Copy the udev rule in `relay/udev_rules/50-usb-relay-dct-tech.rules` under
 `/etc/udev/rules.d/` directory, so that everyone (not just `root` user) has
 read/write access to this type of USB relays.
@@ -108,14 +100,14 @@ a back channel for the reverse-current to dissipate.
 Multiple valves can be connected, each valve can share the common connection to the +
 terminal of the power supply, however each valve requires its own diode and NO relay terminal.
 
-### Usage
+#### Usage
 To initialize the script, run the command:
 ```
-python -i RelayAPI.py
+python -i ./rpi/burnin/RelayAPI.py
 ```
-Enter any of the commands below to utilize the api.
+Enter any of the commands below to utilize the APIs.
 
-### Functionalities
+#### Functionalities
 To list all USB relays that are connected to the computer, use:
 ```
 >>> p = get_all_device_paths()
