@@ -1,15 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Authors: Derek Colby
-# Last Change: Wed Oct 2, 2019 at 4:39 PM -0400
 
 import sys
 
 from threading import Thread, Event
 import queue
 
-from therm import ThermSensor as ther
-from relay import RelayControl
+try:
+    import rpi.burnin.USBRelay as RelayControl
+    from therm import ThermSensor as ther
+except Exception:
+    sys.path.insert(0, '..')
+    import rpi.burnin.USBRelay as RelayControl
 
 lowerBound = int(sys.argv[2])
 upperBound = int(sys.argv[3])

@@ -1,13 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
-# Authors: Jorge Ramirez Ortiz, Yipeng Sun
-# Last Change: Sun Jan 27, 2019 at 02:17 AM -0500
-
+# Authors: Jorge Ramirez Ortiz, Nitzan Hershberg, Yipeng Sun
 
 import RPi.GPIO as GPIO
-import sys
-
-from threading import Thread, Event
+from threading import Thread
 
 
 class WaterAlarm(Thread):
@@ -59,20 +55,3 @@ class WaterAlarm(Thread):
 
     def alarm(self):
         print("Leak!!!")
-
-
-if __name__ == "__main__":  # ensure that script is being run from terminal
-    stop_event = Event()
-
-    print("Initializing water leak detector...")
-    alarm = WaterAlarm(stop_event, ch=int(sys.argv[1]))
-    alarm.start()
-
-    try:
-        while True:
-            pass
-    except KeyboardInterrupt:
-        print("Preparing for graceful shutdown...")
-
-    stop_event.set()
-    alarm.cleanup()
