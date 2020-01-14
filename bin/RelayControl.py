@@ -9,7 +9,7 @@ from threading import Event
 try:
     from rpi.burnin.USBRelay import ON, OFF, RelayControl, get_all_device_paths
 except Exception:
-    sys.path.insert(0, '..')
+    sys.path.insert(0, "..")
     from rpi.burnin.USBRelay import ON, OFF, RelayControl, get_all_device_paths
 
 

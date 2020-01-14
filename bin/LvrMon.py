@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Author: Phoebe Hamilton, Rohan Rajagopalan
+# Authors: Phoebe Hamilton, Rohan Rajagopalan
 
 import threading
 import time
@@ -13,7 +13,7 @@ from math import sqrt
 try:
     from rpi.burnin.ADCPi import ADCPi
 except Exception:
-    sys.path.insert(0, '..')
+    sys.path.insert(0, "..")
     from rpi.burnin.ADCPi import ADCPi
 
 

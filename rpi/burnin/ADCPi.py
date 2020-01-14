@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Author: ABElectronics
+# Authors: ABElectronics
 # Description: ABElectronics ADC Pi V2 8-Channel ADC
 # Note: Requires smbus2 or python smbus to be installed
 

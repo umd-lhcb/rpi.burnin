@@ -8,7 +8,7 @@ from threading import Thread
 
 class WaterAlarm(Thread):
     def __init__(
-        self, stop_event, *args, ch=9, interval=0.01, alarmThreshold=2, **kwargs
+        self, stop_event, *args, ch=9, interval=0.1, alarmThreshold=2, **kwargs
     ):
         self.stop_event = stop_event
         self.ch = ch
@@ -54,4 +54,4 @@ class WaterAlarm(Thread):
         return GPIO.input(self.ch)
 
     def alarm(self):
-        print("Leak!!!")
+        print("Water!")
