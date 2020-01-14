@@ -1,21 +1,22 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Authors: Yipeng Sun, Jorge Ramirez
-# Last Change: Sun Jan 27, 2019 at 02:10 AM -0500
 
 import hid
 import time
+from threading import Thread
 
 # These are found from 'lsusb'; it is formatted as: (vendor_id, product_id)
-RELAY_ID = (0x16c0, 0x05df)
-CMD_SET_ALIAS = 0xfa
-ON = 0xff
-OFF = 0xfd
+RELAY_ID = (0x16C0, 0x05DF)
+CMD_SET_ALIAS = 0xFA
+ON = 0xFF
+OFF = 0xFD
 
 
 #################################
 # Operations on multiple relays #
 #################################
+
 
 def print_all(device_id=RELAY_ID):
     for d in hid.enumerate(*device_id):
@@ -23,12 +24,13 @@ def print_all(device_id=RELAY_ID):
 
 
 def get_all_device_paths(device_id=RELAY_ID):
-    return [d['path'] for d in hid.enumerate(*device_id)]
+    return [d["path"] for d in hid.enumerate(*device_id)]
 
 
 ################################
 # Operations on a single relay #
 ################################
+
 
 def get_device_alias(path):
     return chr_list(get_feature_report(path)[1:6])
@@ -36,11 +38,11 @@ def get_device_alias(path):
 
 def set_device_alias(path, alias):
     if len(alias) > 5:
-        raise ValueError('The length of the alias should not exceed 5.')
+        raise ValueError("The length of the alias should not exceed 5.")
     else:
         cmd = [0, CMD_SET_ALIAS]
         cmd += ord_str(alias)
-        cmd += [0] * (9-len(cmd))
+        cmd += [0] * (9 - len(cmd))
 
         send_cmd(path, cmd)
 
@@ -59,7 +61,7 @@ def set_relay_state(path, idx, state=ON):
     cmd = [0]
     cmd.append(state)
     cmd.append(idx)
-    cmd += [0] * (9-len(cmd))
+    cmd += [0] * (9 - len(cmd))
 
     send_cmd(path, cmd)
 
@@ -69,12 +71,13 @@ def get_relay_state(path, num_of_relays=2):
     if num_of_relays == 2:
         return get_relay_state_two_chs(state_of_all_chs)
     else:
-        return 'Unimplemented for relay with {} channels'.format(num_of_relays)
+        return "Unimplemented for relay with {} channels".format(num_of_relays)
 
 
 ###########
 # Helpers #
 ###########
+
 
 def ord_str(string):
     return [ord(char) for char in string]
@@ -82,12 +85,12 @@ def ord_str(string):
 
 def chr_list(list_of_int):
     chars = [chr_quiet(n) for n in list_of_int]
-    return ''.join(chars)
+    return "".join(chars)
 
 
 def chr_quiet(n):
     if n < 32:
-        return ''
+        return ""
     else:
         return chr(n)
 
@@ -110,10 +113,10 @@ def get_feature_report(path, lower_bd=0, upper_bd=9):
 
 def get_relay_state_two_chs(state):
     state_map = {
-        0: {'CH1': 'OFF', 'CH2': 'OFF'},
-        1: {'CH1': 'ON',  'CH2': 'OFF'},
-        2: {'CH1': 'OFF', 'CH2': 'ON'},
-        3: {'CH1': 'ON',  'CH2': 'ON'}
+        0: {"CH1": "OFF", "CH2": "OFF"},
+        1: {"CH1": "ON", "CH2": "OFF"},
+        2: {"CH1": "OFF", "CH2": "ON"},
+        3: {"CH1": "ON", "CH2": "ON"},
     }
     return state_map[state]
 
@@ -127,7 +130,9 @@ def test_relay(delay=15):
 
     set_relay_state(test[0], 1, OFF)  # ensure it is turned off
 
-    print("Beginning loop with a {} second cycles. Ctrl+C to stop".format(delay))
+    print(
+        "Beginning loop with a {} second cycles. Ctrl+C to stop".format(delay)
+    )
 
     cycles = 0  # counter
     try:
@@ -150,3 +155,41 @@ def test_relay(delay=15):
 
     set_relay_state(test[0], 1, OFF)  # ensure it is turned off
     print("Test Concluded")
+
+
+#########################
+# Relay control wrapper #
+#########################
+# FIXME: This wrapper currently doesn't work.
+
+
+class RelayControl(Thread):
+    def __init__(
+        self, stop_event, *args, relay=None, displayName=None, **kwargs
+    ):
+        self.stop_event = stop_event
+        self.relay = relay
+        self.displayName = displayName
+
+        super().__init__(*args, **kwargs)
+
+    def run(self):
+        self.announce()
+
+    def get(self):
+        get_relay_state(self.relay)
+
+    def set(self, channel, status):
+        set_relay_state(self.relay, channel, status)
+
+    def cleanup(self):
+        for i in range(2):
+            self.set(i + 1, OFF)
+        self.join()
+
+    def announce(self):
+        print(
+            "Starting: relay control from {}, with a display name of {}".format(
+                self.relay, self.displayName
+            )
+        )
