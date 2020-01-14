@@ -1,14 +1,17 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+#
+# Author: ABElectronics
+# Description: ABElectronics ADC Pi V2 8-Channel ADC
+# Note: Requires smbus2 or python smbus to be installed
+# Last Change: Mon Jan 13, 2020 at 10:27 PM -0500
 
-"""
-================================================
-ABElectronics ADC Pi V2 8-Channel ADC
+from __future__ import (
+    absolute_import,
+    division,
+    print_function,
+    unicode_literals,
+)
 
-Requires smbus2 or python smbus to be installed
-================================================
-"""
-from __future__ import absolute_import, division, print_function, \
-                                                    unicode_literals
 try:
     from smbus2 import SMBus
 except ImportError:
@@ -25,6 +28,7 @@ class ADCPi:
     """
     Control the MCP3424 ADC on the ADC Pi Plus and ADC Pi Zero
     """
+
     # internal variables
     __adc1_address = 0x68
     __adc2_address = 0x69
@@ -73,12 +77,12 @@ class ADCPi:
 
         elif device == "raspberrypi":  # running on raspberry pi
             # detect i2C port number and assign to i2c__bus
-            for line in open('/proc/cpuinfo').readlines():
-                model = re.match('(.*?)\\s*:\\s*(.*)', line)
+            for line in open("/proc/cpuinfo").readlines():
+                model = re.match("(.*?)\\s*:\\s*(.*)", line)
                 if model:
                     (name, value) = (model.group(1), model.group(2))
                     if name == "Revision":
-                        if value[-4:] in ('0002', '0003'):
+                        if value[-4:] in ("0002", "0003"):
                             i2c__bus = 0
                         else:
                             i2c__bus = 1
@@ -86,7 +90,7 @@ class ADCPi:
         try:
             return SMBus(i2c__bus)
         except IOError:
-            raise IOError('Could not open the i2c bus')
+            raise IOError("Could not open the i2c bus")
 
     def __updatebyte(self, byte, mask, value):
         byte &= mask
@@ -99,32 +103,40 @@ class ADCPi:
             if channel != self.__adc1_channel:
                 self.__adc1_channel = channel
                 if channel == 1:  # bit 5 = 1, bit 6 = 0
-                    self.__adc1_conf = self.__updatebyte(self.__adc1_conf,
-                                                         0x9F, 0x00)
+                    self.__adc1_conf = self.__updatebyte(
+                        self.__adc1_conf, 0x9F, 0x00
+                    )
                 elif channel == 2:  # bit 5 = 1, bit 6 = 0
-                    self.__adc1_conf = self.__updatebyte(self.__adc1_conf,
-                                                         0x9F, 0x20)
+                    self.__adc1_conf = self.__updatebyte(
+                        self.__adc1_conf, 0x9F, 0x20
+                    )
                 elif channel == 3:  # bit 5 = 0, bit 6 = 1
-                    self.__adc1_conf = self.__updatebyte(self.__adc1_conf,
-                                                         0x9F, 0x40)
+                    self.__adc1_conf = self.__updatebyte(
+                        self.__adc1_conf, 0x9F, 0x40
+                    )
                 elif channel == 4:  # bit 5 = 1, bit 6 = 1
-                    self.__adc1_conf = self.__updatebyte(self.__adc1_conf,
-                                                         0x9F, 0x60)
+                    self.__adc1_conf = self.__updatebyte(
+                        self.__adc1_conf, 0x9F, 0x60
+                    )
         else:
             if channel != self.__adc2_channel:
                 self.__adc2_channel = channel
                 if channel == 5:  # bit 5 = 1, bit 6 = 0
-                    self.__adc2_conf = self.__updatebyte(self.__adc2_conf,
-                                                         0x9F, 0x00)
+                    self.__adc2_conf = self.__updatebyte(
+                        self.__adc2_conf, 0x9F, 0x00
+                    )
                 elif channel == 6:  # bit 5 = 1, bit 6 = 0
-                    self.__adc2_conf = self.__updatebyte(self.__adc2_conf,
-                                                         0x9F, 0x20)
+                    self.__adc2_conf = self.__updatebyte(
+                        self.__adc2_conf, 0x9F, 0x20
+                    )
                 elif channel == 7:  # bit 5 = 0, bit 6 = 1
-                    self.__adc2_conf = self.__updatebyte(self.__adc2_conf,
-                                                         0x9F, 0x40)
+                    self.__adc2_conf = self.__updatebyte(
+                        self.__adc2_conf, 0x9F, 0x40
+                    )
                 elif channel == 8:  # bit 5 = 1, bit 6 = 1
-                    self.__adc2_conf = self.__updatebyte(self.__adc2_conf,
-                                                         0x9F, 0x60)
+                    self.__adc2_conf = self.__updatebyte(
+                        self.__adc2_conf, 0x9F, 0x60
+                    )
         return
 
     # init object with i2caddress, default is 0x68, 0x69 for ADCoPi board
@@ -142,8 +154,7 @@ class ADCPi:
         raw = self.read_raw(channel)
         voltage = float(0.0)
         if not self.__signbit:
-            voltage = float(
-                (raw * (self.__lsb / self.__pga)) * 2.471)
+            voltage = float((raw * (self.__lsb / self.__pga)) * 2.471)
 
         return voltage
 
@@ -154,8 +165,7 @@ class ADCPi:
         raw = self.read_curr_raw()
         voltage = float(0.0)
         if not self.__signbit:
-            voltage = float(
-                (raw * (self.__lsb / self.__pga)) * 2.471)
+            voltage = float((raw * (self.__lsb / self.__pga)) * 2.471)
 
         return voltage
 
@@ -170,7 +180,7 @@ class ADCPi:
             config = self.__adc2_conf
             address = self.__adc2_address
         else:
-            raise ValueError('read_raw: channel out of range')
+            raise ValueError("read_raw: channel out of range")
 
         if self.__conversionmode == 0:
             config = config | (1 << 7)
@@ -179,11 +189,9 @@ class ADCPi:
 
         self.__adcreading = self.__bus.read_i2c_block_data(address, config, 4)
 
-        self.__armed_ch=channel
-        
+        self.__armed_ch = channel
+
         return 0
-
-
 
     def read_curr_raw(self):
         """
@@ -203,7 +211,7 @@ class ADCPi:
             config = self.__adc2_conf
             address = self.__adc2_address
         else:
-            raise ValueError('read_raw: channel out of range')
+            raise ValueError("read_raw: channel out of range")
 
         # if the conversion mode is set to one-shot update the ready bit to 1
 
@@ -220,7 +228,9 @@ class ADCPi:
 
         # keep reading the adc data until the conversion result is ready
         while True:
-            self.__adcreading = self.__bus.read_i2c_block_data(address, config, 4)
+            self.__adcreading = self.__bus.read_i2c_block_data(
+                address, config, 4
+            )
             if self.__bitrate == 18:
                 high = self.__adcreading[0]
                 mid = self.__adcreading[1]
@@ -231,10 +241,10 @@ class ADCPi:
                 mid = self.__adcreading[1]
                 cmdbyte = self.__adcreading[2]
             # check if bit 7 of the command byte is 0.
-            if(cmdbyte & (1 << 7)) == 0:
+            if (cmdbyte & (1 << 7)) == 0:
                 break
             elif time.time() > timeout_time:
-                msg = 'read_raw: channel %i conversion timed out' % channel
+                msg = "read_raw: channel %i conversion timed out" % channel
                 raise TimeoutError(msg)
 
         self.__signbit = False
@@ -256,13 +266,11 @@ class ADCPi:
             raw = raw & ~(1 << 13)  # reset sign bit to 0
 
         elif self.__bitrate == 12:
-            raw = ((high & 0x0f) << 8) | mid
+            raw = ((high & 0x0F) << 8) | mid
             self.__signbit = bool(raw & (1 << 11))
             raw = raw & ~(1 << 11)  # reset sign bit to 0
 
         return raw
-
-
 
     def read_raw(self, channel):
         """
@@ -282,7 +290,7 @@ class ADCPi:
             config = self.__adc2_conf
             address = self.__adc2_address
         else:
-            raise ValueError('read_raw: channel out of range')
+            raise ValueError("read_raw: channel out of range")
 
         # if the conversion mode is set to one-shot update the ready bit to 1
         if self.__conversionmode == 0:
@@ -314,10 +322,10 @@ class ADCPi:
                 mid = __adcreading[1]
                 cmdbyte = __adcreading[2]
             # check if bit 7 of the command byte is 0.
-            if(cmdbyte & (1 << 7)) == 0:
+            if (cmdbyte & (1 << 7)) == 0:
                 break
             elif time.time() > timeout_time:
-                msg = 'read_raw: channel %i conversion timed out' % channel
+                msg = "read_raw: channel %i conversion timed out" % channel
                 raise TimeoutError(msg)
 
         self.__signbit = False
@@ -339,7 +347,7 @@ class ADCPi:
             raw = raw & ~(1 << 13)  # reset sign bit to 0
 
         elif self.__bitrate == 12:
-            raw = ((high & 0x0f) << 8) | mid
+            raw = ((high & 0x0F) << 8) | mid
             self.__signbit = bool(raw & (1 << 11))
             raw = raw & ~(1 << 11)  # reset sign bit to 0
 
@@ -375,7 +383,7 @@ class ADCPi:
             self.__adc2_conf = self.__updatebyte(self.__adc2_conf, 0xFC, 0x03)
             self.__pga = 4.0
         else:
-            raise ValueError('set_pga: gain out of range')
+            raise ValueError("set_pga: gain out of range")
 
         self.__bus.write_byte(self.__adc1_address, self.__adc1_conf)
         self.__bus.write_byte(self.__adc2_address, self.__adc2_conf)
@@ -415,7 +423,7 @@ class ADCPi:
             self.__bitrate = 18
             self.__lsb = 0.0000078125
         else:
-            raise ValueError('set_bit_rate: rate out of range')
+            raise ValueError("set_bit_rate: rate out of range")
 
         self.__bus.write_byte(self.__adc1_address, self.__adc1_conf)
         self.__bus.write_byte(self.__adc2_address, self.__adc2_conf)
@@ -438,6 +446,6 @@ class ADCPi:
             self.__adc2_conf = self.__updatebyte(self.__adc1_conf, 0xEF, 0x10)
             self.__conversionmode = 1
         else:
-            raise ValueError('set_conversion_mode: mode out of range')
+            raise ValueError("set_conversion_mode: mode out of range")
 
         return
