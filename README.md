@@ -61,7 +61,7 @@ The `ThermSensor.py` script will automatically loop and output the temperature
 values for every connected thermistor. Run the script with an integer value
 to specify the delay between each readout in seconds:
 ```
-python ThermSensor.py 4
+python3 ./bin/ThermSensor.py 4
 ```
 
 
