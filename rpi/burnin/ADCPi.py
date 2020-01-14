@@ -3,7 +3,6 @@
 # Author: ABElectronics
 # Description: ABElectronics ADC Pi V2 8-Channel ADC
 # Note: Requires smbus2 or python smbus to be installed
-# Last Change: Mon Jan 13, 2020 at 10:27 PM -0500
 
 from __future__ import (
     absolute_import,

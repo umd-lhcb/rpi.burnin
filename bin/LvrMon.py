@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 #
-# Last Change: Mon Jan 13, 2020 at 10:23 PM -0500
 # Author: Phoebe Hamilton, Rohan Rajagopalan
 
 import threading
