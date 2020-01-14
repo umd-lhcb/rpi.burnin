@@ -2,3 +2,4 @@ RPi.GPIO
 hidapi
 black
 curses-menu
+smbus2
