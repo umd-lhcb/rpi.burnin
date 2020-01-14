@@ -10,6 +10,9 @@ pkgs.mkShell {
     # Compilers and other build dependencies
     pkgs.gcc
 
+    # Some Python libraries needs to be installed via nix
+    hidapi
+
     # Python requirements (enough to get a virtualenv going).
     virtualenvwrapper
   ];
