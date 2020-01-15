@@ -8,10 +8,11 @@ pkgs.mkShell {
   name = "pip-env";
   buildInputs = with pythonPackages; [
     # Compilers and other build dependencies
-    pkgs.gcc
+    #pkgs.gcc
 
     # Some Python libraries needs to be installed via nix
     hidapi
+    RPi.GPIO
 
     # Python requirements (enough to get a virtualenv going).
     virtualenvwrapper
