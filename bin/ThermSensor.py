@@ -51,7 +51,7 @@ def get_all_sensors(stop_event, queue):
                 stop_event,
                 queue,
                 sensor=sensor_path[i],
-                displayName=str(i),
+                display_name=str(i),
                 interval=int(sys.argv[1]),
             )
         )
