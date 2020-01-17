@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+from setuptools import setup
 from os import path
 # io.open is needed for projects that support Python 2.7
 # It ensures open() defaults to text mode with universal newlines,
 # and accepts an argument to specify the text encoding
 # Python 3 only projects can skip this import
 from io import open
+
+from rpi.burnin import name, version
 
 here = path.abspath(path.dirname(__file__))
 
@@ -19,8 +21,8 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 # Fields marked as "Optional" may be commented out.
 
 setup(
-    name='rpi.burnin',
-    version='0.3.0',
+    name=name,
+    version=version,
     description='Rasberry Pi Python modules for burn-in ',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -36,8 +38,8 @@ setup(
         'Programming Language :: Python :: 3',
     ],
 
-    packages=find_packages('rpi.burnin'),
-    python_requires='>=3, <4',
+    packages=['rpi', 'rpi.burnin'],
 
+    python_requires='>=3, <4',
     install_requires=['RPi.GPIO']
 )
