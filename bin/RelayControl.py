@@ -4,39 +4,37 @@
 
 import sys
 from threading import Event
+from queue import Queue
+from time import sleep
 
 # from relay.RelayAPI import *
 try:
-    from rpi.burnin.USBRelay import ON, OFF, RelayControl, get_all_device_paths
+    from rpi.burnin.USBRelay import RelayControl, get_all_device_paths
 except Exception:
     sys.path.insert(0, "..")
-    from rpi.burnin.USBRelay import ON, OFF, RelayControl, get_all_device_paths
+    from rpi.burnin.USBRelay import RelayControl, get_all_device_paths
 
 
 if __name__ == "__main__":
-    # detect sensors and assign threads
-    relay_path = get_all_device_paths()
-    controller_list = []
+    relay_paths = get_all_device_paths()
+    sleep_time = sys.argv[1]
     stop_event = Event()
+    queue = Queue()
 
-    # create new threads
-    for i in range(len(relay_path)):
-        controller_list.append(
-            RelayControl(stop_event, relay=relay_path[i], displayName=str(i))
-        )
-
-    # start new threads once all have been initialized
-    for controller in controller_list:
-        controller.start()
+    controller = RelayControl(stop_event, queue)
 
     try:
         while True:
             # turn on/off relays with certain interval
-            pass
+            for p in relay_paths:
+                for idx in range(2):
+                    queue.put('{},{},on')
+                    sleep(sleep_time)
+                    queue.put('{},{},on')
+
     except KeyboardInterrupt:
         print("Preparing for graceful shutdown...")
 
     # cleanup in the end
     stop_event.set()
-    for controller in controller_list:
-        controller.cleanup()
+    controller.cleanup()

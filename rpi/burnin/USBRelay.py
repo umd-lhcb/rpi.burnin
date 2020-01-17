@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Authors: Yipeng Sun, Jorge Ramirez
+# Authors: Yipeng Sun, Jorge Ramirez, Derek Colby
 
 import hid
 import time
@@ -122,7 +122,7 @@ def get_relay_state_two_chs(state):
 
 
 def test_relay(delay=15):
-    test = get_all_device_paths()  # default seconds to pause btwn cycles
+    test = get_all_device_paths()  # default seconds to pause between cycles
 
     print("Starting configuration:")
     print(get_relay_state(test[0]))
@@ -165,31 +165,26 @@ def test_relay(delay=15):
 
 class RelayControl(Thread):
     def __init__(
-        self, stop_event, *args, relay=None, displayName=None, **kwargs
+        self, stop_event, queue, *args, **kwargs
     ):
         self.stop_event = stop_event
-        self.relay = relay
-        self.displayName = displayName
+        self.queue = queue
 
         super().__init__(*args, **kwargs)
 
     def run(self):
-        self.announce()
-
-    def get(self):
-        get_relay_state(self.relay)
-
-    def set(self, channel, status):
-        set_relay_state(self.relay, channel, status)
+        while not self.stop_event.wait():
+            relay_path, idx, state = self.queue.get().split(',')
+            set_relay_state(relay_path, idx, self.translate_state(state))
 
     def cleanup(self):
-        for i in range(2):
-            self.set(i + 1, OFF)
         self.join()
 
-    def announce(self):
-        print(
-            "Starting: relay control from {}, with a display name of {}".format(
-                self.relay, self.displayName
-            )
-        )
+    @staticmethod
+    def translate_state(state):
+        if state.lower() == 'on':
+            return ON
+        elif state.lower() == 'off':
+            return OFF
+        else:
+            raise ValueError('Unknown state: {}'.format(state))
