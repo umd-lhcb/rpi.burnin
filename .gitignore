@@ -2,3 +2,4 @@
 .python-version
 .virtualenv
 build
+dist
