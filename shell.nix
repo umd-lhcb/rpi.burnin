@@ -12,7 +12,7 @@ pkgs.mkShell {
 
     # Some Python libraries needs to be installed via nix
     hidapi
-    RPi.GPIO
+    RPi_GPIO
 
     # Python requirements (enough to get a virtualenv going).
     virtualenvwrapper
