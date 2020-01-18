@@ -12,14 +12,14 @@ class ThermSensor(Thread):
         queue,
         *args,
         sensor=None,
-        display_name=None,
+        displayName=None,
         interval=5,
         **kwargs
     ):
         self.stop_event = stop_event
         self.queue = queue
         self.sensor = sensor
-        self.display_name = display_name
+        self.displayName = displayName
         self.interval = interval
         self.false_alarm_list = []
 
