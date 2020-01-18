@@ -11,13 +11,15 @@ pip3 install --user -r ./requirements.txt
 
 
 ## Usage
+**Note**: All scripts in `bin` assumes you run them in the `bin` folder.
 
 ### `bin/Continuity.py`
 Continuity checker for the backplane testing.
 
 Invoke with:
 ```
-python3 ./bin/Continuity.py
+cd bin
+python3 .Continuity.py
 ```
 
 * `Ctrl-C` to quit
@@ -32,10 +34,11 @@ reading and outputting the data values from one thermometer.  Written by Jorge
 Ramirez, improvements by Yipeng Sun.
 
 #### Setup
-In the raspberry pi's `/boot/config.txt`, add the following line:
+For Raspbian, in the raspberry pi's `/boot/config.txt`, add the following line:
 ```
 dtoverlay=w1-gpio,pullup=1
 ```
+For NixOS, it should already be configured.
 
 The thermistors are wired in parallel by connecting their GND to the VDD pins,
 and then both to shared ground (Pin 6). The DQ pin carries the data signal into
@@ -61,7 +64,8 @@ The `ThermSensor.py` script will automatically loop and output the temperature
 values for every connected thermistor. Run the script with an integer value
 to specify the delay between each readout in seconds:
 ```
-python3 ./bin/ThermSensor.py 4
+cd bin
+python3 ./ThermSensor.py 4
 ```
 
 
@@ -131,3 +135,8 @@ where `t` is the number of seconds between each ON/OFF switch:
 ```
 which will initiate a loop where there is a 12 second pause between ON/OFF
 switches. Use Ctrl+C to exit.
+
+
+## Development
+In NixOS, run `nix-shell` in the root folder of this project. All needed
+dependencies should become available in that shell.
