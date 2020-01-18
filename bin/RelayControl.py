@@ -17,11 +17,12 @@ except Exception:
 
 if __name__ == "__main__":
     relay_paths = get_all_device_paths()
-    sleep_time = sys.argv[1]
+    sleep_time = int(sys.argv[1])
     stop_event = Event()
     queue = Queue()
 
     controller = RelayControl(stop_event, queue)
+    controller.start()
 
     try:
         while True:

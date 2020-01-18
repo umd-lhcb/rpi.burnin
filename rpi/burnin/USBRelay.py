@@ -129,6 +129,7 @@ def test_relay(delay=15):
     print(get_all_device_paths())
 
     set_relay_state(test[0], 1, OFF)  # ensure it is turned off
+    set_relay_state(test[0], 2, OFF)
 
     print(
         "Beginning loop with a {} second cycles. Ctrl+C to stop".format(delay)
@@ -139,10 +140,12 @@ def test_relay(delay=15):
         while True:
             print("Turning Relay On")
             set_relay_state(test[0], 1, ON)
+            set_relay_state(test[0], 2, ON)
             time.sleep(delay)
 
             print("Turning Relay Off")
             set_relay_state(test[0], 1, OFF)
+            set_relay_state(test[0], 2, OFF)
             time.sleep(delay)
             cycles += 1
             if cycles == 1:
@@ -154,6 +157,7 @@ def test_relay(delay=15):
         print("Preparing for graceful shutdown...")
 
     set_relay_state(test[0], 1, OFF)  # ensure it is turned off
+    set_relay_state(test[0], 2, OFF)
     print("Test Concluded")
 
 
