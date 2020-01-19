@@ -4,7 +4,6 @@
 
 import hid
 import time
-from threading import Thread
 
 # These are found from 'lsusb'; it is formatted as: (vendor_id, product_id)
 RELAY_ID = (0x16C0, 0x05DF)
@@ -159,37 +158,3 @@ def test_relay(delay=15):
     set_relay_state(test[0], 1, OFF)  # ensure it is turned off
     set_relay_state(test[0], 2, OFF)
     print("Test Concluded")
-
-
-#########################
-# Relay control wrapper #
-#########################
-# FIXME: This wrapper currently doesn't work.
-
-
-class RelayControl(Thread):
-    def __init__(
-        self, stop_event, queue, *args, **kwargs
-    ):
-        self.stop_event = stop_event
-        self.queue = queue
-
-        super().__init__(*args, **kwargs)
-
-    def run(self):
-        while not self.stop_event.is_set():
-            relay_path, idx, state = self.queue.get().split(',')
-            relay_path = bytes(relay_path, 'utf-8')  # hidapi API requires bytes, not string
-            set_relay_state(relay_path, idx, self.translate_state(state))
-
-    def cleanup(self):
-        self.join()
-
-    @staticmethod
-    def translate_state(state):
-        if state.lower() == 'on':
-            return ON
-        elif state.lower() == 'off':
-            return OFF
-        else:
-            raise ValueError('Unknown state: {}'.format(state))
