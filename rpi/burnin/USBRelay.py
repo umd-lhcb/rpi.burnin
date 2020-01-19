@@ -179,6 +179,7 @@ class RelayControl(Thread):
     def run(self):
         while not self.stop_event.is_set():
             relay_path, idx, state = self.queue.get().split(',')
+            relay_path = bytes(relay_path, 'utf-8')  # hidapi API requires bytes, not string
             set_relay_state(relay_path, idx, self.translate_state(state))
 
     def cleanup(self):
