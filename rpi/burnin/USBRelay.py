@@ -177,7 +177,7 @@ class RelayControl(Thread):
         super().__init__(*args, **kwargs)
 
     def run(self):
-        while not self.stop_event.wait():
+        while not self.stop_event.is_set():
             relay_path, idx, state = self.queue.get().split(',')
             set_relay_state(relay_path, idx, self.translate_state(state))
 
