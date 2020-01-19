@@ -41,5 +41,5 @@ setup(
     packages=['rpi', 'rpi.burnin'],
 
     python_requires='>=3, <4',
-    install_requires=['RPi.GPIO']
+    install_requires=['RPi.GPIO', 'hidapi']
 )
