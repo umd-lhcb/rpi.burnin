@@ -2,8 +2,18 @@
 #
 # Authors: Jorge Ramirez Ortiz, Nitzan Hershberg, Yipeng Sun
 
-import RPi.GPIO as GPIO
 from threading import Thread
+
+try:
+    import RPi.GPIO as GPIO
+except (ModuleNotFoundError, ImportError):
+    import sys
+    import fake_rpi
+
+    sys.modules['RPi'] = fake_rpi.RPi
+    sys.modules['smbus'] = fake_rpi.smbus
+
+    import RPi.GPIO as GPIO
 
 
 class WaterAlarm(Thread):
