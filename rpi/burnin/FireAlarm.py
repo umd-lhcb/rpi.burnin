@@ -51,19 +51,4 @@ class FireAlarm(Thread):
         return GPIO.input(self.ch)
 
     def alarm(self):
-        print("Fire!!!")
-
-
-if __name__ == "__main__":
-    import sys
-
-    alarm = AlarmSetup(ch=int(sys.argv[1]))
-
-    while True:
-        try:
-            if alarm.read_channel() == 0:
-                print("Fire!")
-        except KeyboardInterrupt:
-            break
-
-    alarm.cleanup()
+        print("Fire!")
