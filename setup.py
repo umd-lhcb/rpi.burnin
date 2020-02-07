@@ -23,7 +23,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 setup(
     name=name,
     version=version,
-    description='Rasberry Pi Python modules for burn-in ',
+    description='Rasberry Pi Python modules for burn-in.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/umd-lhcb/rpi.burnin',
