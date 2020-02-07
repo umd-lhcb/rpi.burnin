@@ -95,7 +95,7 @@ The CP100 Rain Bird Solenoid Valve is connected to the NO (normally open)
 terminal of the USB Relay so that water will only flow when the Relay turns on
 and the switch is flipped. Tests showed that the reverse-current created by the
 solenoid's voltage spike was enough to damage the relay and force it to reset.
-A ![60V 5.5A diode](http://www.irf.com/product-info/datasheets/data/50wq06fn.pdf)
+A [60V 5.5A diode](http://www.irf.com/product-info/datasheets/data/50wq06fn.pdf)
 was included in the circuit to allow a back channel for the reverse-current to
 dissipate.
 
