@@ -91,11 +91,13 @@ Copy the udev rule in `udev_rules/50-usb-relay-dct-tech.rules` under
 `/etc/udev/rules.d/` directory, so that everyone (not just `root` user) has
 read/write access to this type of USB relays.
 
-The CP100 Rain Bird Solenoid Valve is connected to the NO (normally open) terminal of the
-USB Relay so that water will only flow when the Relay turns on and the switch is flipped.
-Tests showed that the reverse-current created by the solenoid's voltage spike was enough to
-damage the relay and force it to reset. A 60V 5.5A diode (http://www.irf.com/product-info/datasheets/data/50wq06fn.pdf) was included in the circuit to allow
-a back channel for the reverse-current to dissipate.
+The CP100 Rain Bird Solenoid Valve is connected to the NO (normally open)
+terminal of the USB Relay so that water will only flow when the Relay turns on
+and the switch is flipped. Tests showed that the reverse-current created by the
+solenoid's voltage spike was enough to damage the relay and force it to reset.
+A ![60V 5.5A diode](http://www.irf.com/product-info/datasheets/data/50wq06fn.pdf)
+was included in the circuit to allow a back channel for the reverse-current to
+dissipate.
 
 ![Single valve diagram](docs/lhcb_valve_diagram.png)
 
