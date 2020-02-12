@@ -35,13 +35,16 @@ class FireAlarm(Thread):
         #   to pull it down to 0.
         #   Maybe we don't need this parameter after all.
         # GPIO.setup(self.ch, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.setup(self.ch, GPIO.IN)
 
+        # Must set pin to pull-up (to 1) because fire alarm will start high
+        # and pull low (pull-down to 0) once the alarm triggers.
+        GPIO.setup(self.ch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        
         super().__init__(*args, **kwargs)
 
     def run(self):
         while not self.stop_event.wait(self.interval):
-            if self.read_channel() == 1:
+            if self.read_channel() == 0:
                 self.alarm()
 
     def cleanup(self):
