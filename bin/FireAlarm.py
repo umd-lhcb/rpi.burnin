@@ -6,10 +6,10 @@ import sys
 from threading import Event
 
 try:
-    from rpi.burnin.WaterAlarm import FireAlarm
+    from rpi.burnin.FireAlarm import FireAlarm
 except Exception:
     sys.path.insert(0, "..")
-    from rpi.burnin.WaterAlarm import FireAlarm
+    from rpi.burnin.FireAlarm import FireAlarm
 
 
 if __name__ == "__main__":  # ensure that script is being run from terminal
