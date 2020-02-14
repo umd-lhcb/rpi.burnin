@@ -39,7 +39,7 @@ class FireAlarm(Thread):
         # Must set pin to pull-up (to 1) because fire alarm will start high
         # and pull low (pull-down to 0) once the alarm triggers.
         GPIO.setup(self.ch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        
+
         super().__init__(*args, **kwargs)
 
     def run(self):
