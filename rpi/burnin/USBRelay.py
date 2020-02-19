@@ -62,7 +62,7 @@ def set_relay_state(path, idx, state=ON):
     cmd.append(idx)
     cmd += [0] * (9 - len(cmd))
 
-    send_cmd(path, cmd)
+    return send_cmd(path, cmd)
 
 
 def get_relay_state(path, num_of_relays=2):
@@ -97,8 +97,10 @@ def chr_quiet(n):
 def send_cmd(path, cmd):
     dev = hid.device()
     dev.open_path(path)
-    dev.send_feature_report(cmd)
+    ret_code = dev.send_feature_report(cmd)
     dev.close()
+
+    return ret_code
 
 
 def get_feature_report(path, lower_bd=0, upper_bd=9):
