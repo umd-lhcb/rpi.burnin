@@ -5,7 +5,7 @@ let
 in
 
 pkgs.mkShell {
-  name = "pip-env";
+  name = "rpi.burnin";
   buildInputs = with pythonPackages; [
     # Compilers and other build dependencies
     #pkgs.gcc
