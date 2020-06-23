@@ -3,6 +3,7 @@
 # Authors: Jorge Ramirez Ortiz, Nitzan Hershberg, Yipeng Sun
 
 from threading import Thread
+from time import sleep
 
 try:
     import RPi.GPIO as GPIO
@@ -18,12 +19,14 @@ except (ModuleNotFoundError, ImportError):
 
 class WaterAlarm(Thread):
     def __init__(
-        self, stop_event, *args, ch=9, interval=0.1, alarmThreshold=2, **kwargs
+        self, stop_event, *args, ch=9, interval=0.1, alarmThreshold=2,
+        debounce=60, **kwargs
     ):
         self.stop_event = stop_event
         self.ch = ch
         self.interval = interval
         self.alarmThreshold = alarmThreshold
+        self.debounce = debounce
 
         # 'leak_counter' variable can be used to guard against false alarms.
         #
@@ -55,6 +58,7 @@ class WaterAlarm(Thread):
                 self.leak_counter += 1
                 if self.leak_counter >= self.alarmThreshold:
                     self.alarm()
+                    sleep(self.debounce)
 
     def cleanup(self):
         GPIO.cleanup(self.ch)

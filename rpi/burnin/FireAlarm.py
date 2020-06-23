@@ -3,6 +3,7 @@
 # Authors: Yipeng Sun
 
 from threading import Thread
+from time import sleep
 
 try:
     import RPi.GPIO as GPIO
@@ -17,10 +18,12 @@ except (ModuleNotFoundError, ImportError):
 
 
 class FireAlarm(Thread):
-    def __init__(self, stop_event, *args, ch=8, interval=0.1, **kwargs):
+    def __init__(self, stop_event, *args, ch=8, interval=0.1, debounce=60,
+                 **kwargs):
         self.stop_event = stop_event
         self.ch = ch
         self.interval = interval
+        self.debounce = debounce
 
         # Use the Board numbering
         GPIO.setmode(GPIO.BOARD)
@@ -46,6 +49,7 @@ class FireAlarm(Thread):
         while not self.stop_event.wait(self.interval):
             if self.read_channel() == 0:
                 self.alarm()
+                sleep(self.debounce)
 
     def cleanup(self):
         GPIO.cleanup()
