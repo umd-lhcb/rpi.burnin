@@ -61,7 +61,7 @@ class WaterAlarm(Thread):
                     sleep(self.debounce)
 
     def cleanup(self):
-        GPIO.cleanup(self.ch)
+        GPIO.cleanup()
         self.join()
 
     def read_channel(self):

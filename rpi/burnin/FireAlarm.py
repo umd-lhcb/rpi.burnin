@@ -53,6 +53,7 @@ class FireAlarm(Thread):
 
     def cleanup(self):
         GPIO.cleanup()
+        self.join()
 
     def read_channel(self):
         return GPIO.input(self.ch)
