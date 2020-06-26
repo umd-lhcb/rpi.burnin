@@ -35,14 +35,20 @@ class ThermSensor(Thread):
     def get(self):
         all_temp = []
         for idx, s in enumerate(self.sensor):
-            with s.open() as f:
-                contents = f.readlines()
-                # extract raw data into variable "temp_string"
-                data_pos = contents[1].find("t=")
-                temp_string = contents[1].strip()[data_pos + 2 :]
-            temp = self.thermal_readout_guard(temp_string, idx)
-            if temp:
-                all_temp.append(temp)
+            try:
+                with s.open() as f:
+                    contents = f.readlines()
+                    # extract raw data into variable "temp_string"
+                    data_pos = contents[1].find("t=")
+                    temp_string = contents[1].strip()[data_pos + 2 :]
+
+                temp = self.thermal_readout_guard(temp_string, idx)
+
+                if temp:
+                    all_temp.append(temp)
+
+            except Exception:
+                print('An error occurred when trying to read sensor: {}'.format(s))
 
         if all_temp:
             return mean(all_temp)
