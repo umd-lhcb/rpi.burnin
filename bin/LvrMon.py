@@ -2,12 +2,10 @@
 #
 # Authors: Phoebe Hamilton, Rohan Rajagopalan
 
-import threading
 import time
 import curses
-import os
-import unicodedata
 import sys
+
 from math import sqrt
 
 try:

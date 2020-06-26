@@ -4,8 +4,9 @@
 
 import curses
 import sys
-from math import sqrt, ceil, pow
 import time
+
+from math import sqrt, ceil, pow
 from cursesmenu import *
 from cursesmenu.items import *
 
@@ -17,7 +18,12 @@ except ModuleNotFoundError:
     sys.modules["RPi"] = fake_rpi.RPi
     sys.modules["smbus"] = fake_rpi.smbus
 
-from rpi.burnin.ADCPi import ADCPi
+try:
+    from rpi.burnin.ADCPi import ADCPi
+except Exception:
+    sys.path.insert(0, "..")
+    from rpi.burnin.ADCPi import ADCPi
+
 
 pins = [11, 12, 13, 15, 16, 18, 22, 7]
 JP_assignments = [0, 1, 1, 0, 2, 3, 3, 2, 4, 5, 5, 4]
