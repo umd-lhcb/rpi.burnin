@@ -15,6 +15,7 @@ class ThermSensor(Thread):
         sensor=None,
         displayName=None,
         interval=5,
+        failedToReadThresh=20,
         **kwargs
     ):
         self.stop_event = stop_event
@@ -22,6 +23,10 @@ class ThermSensor(Thread):
         self.sensor = sensor
         self.displayName = displayName
         self.interval = interval
+
+        self.failedToReadThresh = failedToReadThresh
+        self.sensor_failure_count = 0
+
         self.false_alarm_list = [[] for _ in sensor]
 
         super().__init__(*args, **kwargs)
@@ -49,9 +54,12 @@ class ThermSensor(Thread):
 
             except Exception:
                 print('An error occurred when trying to read sensor: {}'.format(s))
+                self.sensor_failure_count += 1
 
         if all_temp:
             return mean(all_temp)
+        elif self.sensor_failure_count >= self.failedToReadThresh:
+            return 255  # This will trigger the over-temperature protection for sure!
         else:
             return None
 
