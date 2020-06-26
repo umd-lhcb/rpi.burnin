@@ -2,42 +2,21 @@
 #
 # Author: Phoebe Hamilton, with base from Rohan Rajagopalan
 
-import threading
 import curses
-import os
-import unicodedata
 import sys
-from math import sqrt,ceil,pow
+from math import sqrt, ceil, pow
 import time
 from cursesmenu import *
 from cursesmenu.items import *
 
-def load_fake():
-    import sys
-    import fake_rpi
-    sys.modules['RPi']=fake_rpi.RPi
-    sys.modules['smbus']=fake_rpi.smbus
-
 try:
     import RPi.GPIO as GPIO
-#except ImportError:
-#    import fake_rpigpio.utils
-#    fake_rpigpio.utils.install()
-#except ModuleNotFoundError:
-#    import fake_rpigpio.utils
-#    fake_rpigpio.utils.install()
 except ModuleNotFoundError:
-    import RPi
-    GPIO=RPi.GPIO
-    from fake_rpi import wrappers
-    wrappers.toggle_print(False)
-except ImportError:
-    import RPi
-    GPIO=RPi.GPIO
-    from fake_rpi import wrappers
-    wrappers.toggle_print(False)
+    import fake_rpi
+    sys.modules['RPi'] = fake_rpi.RPi
+    sys.modules['smbus'] = fake_rpi.smbus
 
-from ADCPi import ADCPi
+from rpi.burnin.ADCPi import ADCPi
 
 pins = [11, 12, 13, 15, 16, 18, 22, 7]
 JP_assignments=[0,1,1,0,2,3,3,2,4,5,5,4]

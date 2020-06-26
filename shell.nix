@@ -1,28 +1,36 @@
 let
-  pkgs = import <nixpkgs> {};
+  pkgs = import <nixpkgs> { overlays = [(import ./nix/burnin)]; };
   python = pkgs.python3;
   pythonPackages = python.pkgs;
+  stdenv = pkgs.stdenv;
 in
 
 pkgs.mkShell {
   name = "rpi.burnin";
   buildInputs = with pythonPackages; [
     # Compilers and other build dependencies
-    #pkgs.gcc
+    stdenv
 
     # Some Python libraries needs to be installed via nix
     hidapi
-    RPi_GPIO
 
     # Python requirements (enough to get a virtualenv going).
     virtualenvwrapper
-  ];
+  ]
+  ++ stdenv.lib.optionals (stdenv.isDarwin) [ fake_rpi ]
+  ++ stdenv.lib.optionals (!stdenv.isDarwin) [ RPi_GPIO ]
+  ;
 
   shellHook = ''
     # Allow the use of wheels.
     SOURCE_DATE_EPOCH=$(date +%s)
 
-    VENV=./.virtualenv
+    if test -d $HOME/build/python-venv; then
+      VENV=$HOME/build/python-venv/rpi.burnin
+    else
+      VENV=./.virtualenv
+    fi
+
     if test ! -d $VENV; then
       virtualenv $VENV
     fi
