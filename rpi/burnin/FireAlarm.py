@@ -11,15 +11,16 @@ except (ModuleNotFoundError, ImportError):
     import sys
     import fake_rpi
 
-    sys.modules['RPi'] = fake_rpi.RPi
-    sys.modules['smbus'] = fake_rpi.smbus
+    sys.modules["RPi"] = fake_rpi.RPi
+    sys.modules["smbus"] = fake_rpi.smbus
 
     import RPi.GPIO as GPIO
 
 
 class FireAlarm(Thread):
-    def __init__(self, stop_event, *args, ch=8, interval=0.1, debounce=60,
-                 **kwargs):
+    def __init__(
+        self, stop_event, *args, ch=8, interval=0.1, debounce=60, **kwargs
+    ):
         self.stop_event = stop_event
         self.ch = ch
         self.interval = interval
