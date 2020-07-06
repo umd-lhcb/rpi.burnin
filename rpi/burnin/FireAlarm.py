@@ -19,15 +19,24 @@ except (ModuleNotFoundError, ImportError):
 
 class FireAlarm(Thread):
     def __init__(
-        self, stop_event, *args, ch=8, interval=0.1, debounce=60, **kwargs
+        self,
+        stop_event,
+        *args,
+        ch=8,
+        interval=0.1,
+        debounce=60,
+        gpio_init_cleanup=True,
+        **kwargs
     ):
         self.stop_event = stop_event
         self.ch = ch
         self.interval = interval
         self.debounce = debounce
+        self.gpio_init_cleanup = gpio_init_cleanup
 
         # Use the Board numbering
-        GPIO.setmode(GPIO.BOARD)
+        if self.gpio_init_cleanup:
+            GPIO.setmode(GPIO.BOARD)
 
         # To quote from:
         # https://www.raspberrypi.org/forums/viewtopic.php?t=87292
@@ -53,7 +62,8 @@ class FireAlarm(Thread):
                 sleep(self.debounce)
 
     def cleanup(self):
-        GPIO.cleanup()
+        if self.gpio_init_cleanup:
+            GPIO.cleanup()
         self.join()
 
     def read_channel(self):

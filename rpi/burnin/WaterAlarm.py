@@ -26,6 +26,7 @@ class WaterAlarm(Thread):
         interval=0.1,
         alarmThreshold=2,
         debounce=60,
+        gpio_init_cleanup=True,
         **kwargs
     ):
         self.stop_event = stop_event
@@ -33,6 +34,7 @@ class WaterAlarm(Thread):
         self.interval = interval
         self.alarmThreshold = alarmThreshold
         self.debounce = debounce
+        self.gpio_init_cleanup = gpio_init_cleanup
 
         # 'leak_counter' variable can be used to guard against false alarms.
         #
@@ -48,7 +50,8 @@ class WaterAlarm(Thread):
         # of water)
         self.leak_counter = 0
 
-        GPIO.setmode(GPIO.BOARD)
+        if self.gpio_init_cleanup:
+            GPIO.setmode(GPIO.BOARD)
 
         # nominal: no water means circuit is open & BCM 17 is LOW due to
         #          PULLDOWN
@@ -67,7 +70,8 @@ class WaterAlarm(Thread):
                     sleep(self.debounce)
 
     def cleanup(self):
-        GPIO.cleanup()
+        if self.gpio_init_cleanup:
+            GPIO.cleanup()
         self.join()
 
     def read_channel(self):

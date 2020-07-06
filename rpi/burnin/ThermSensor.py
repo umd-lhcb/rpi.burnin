@@ -53,7 +53,9 @@ class ThermSensor(Thread):
                     all_temp.append(temp)
 
             except Exception:
-                print('An error occurred when trying to read sensor: {}'.format(s))
+                print(
+                    "An error occurred when trying to read sensor: {}".format(s)
+                )
                 self.sensor_failure_count += 1
 
         if all_temp:
