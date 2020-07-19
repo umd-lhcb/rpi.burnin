@@ -13,6 +13,9 @@ pkgs.mkShell {
 
     # Some Python libraries needs to be installed via nix
     hidapi
+
+    # Code formatter
+    black
   ]
   ++ stdenv.lib.optionals (stdenv.isDarwin) [ fake_rpi ]
   ++ stdenv.lib.optionals (!stdenv.isDarwin) [ RPi_GPIO ]
