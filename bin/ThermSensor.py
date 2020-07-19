@@ -45,13 +45,13 @@ def get_all_sensors(stop_event, queue):
     sensor_list = []
 
     # create new threads
-    for i in range(len(sensor_path)):
+    for idx, sensor in enumerate(sensor_path, start=1):
         sensor_list.append(
             ThermSensor(
                 stop_event,
                 queue,
-                sensor=sensor_path[i],
-                displayName=str(i),
+                sensor=[sensor],
+                displayName=str(idx),
                 interval=int(sys.argv[1]),
             )
         )
