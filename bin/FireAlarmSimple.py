@@ -21,6 +21,7 @@ if __name__ == "__main__":  # ensure that script is being run from terminal
     ch = int(sys.argv[1])
     interval = 0.1
 
+    GPIO.setmode(GPIO.BOARD)
     GPIO.setup(ch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     try:
@@ -31,4 +32,4 @@ if __name__ == "__main__":  # ensure that script is being run from terminal
             sleep(interval)
 
     except KeyboardInterrupt:
-        pass
+        GPIO.cleanup()
