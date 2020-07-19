@@ -20,8 +20,7 @@ if __name__ == "__main__":  # ensure that script is being run from terminal
     alarm.start()
 
     try:
-        while True:
-            pass
+        alarm.join()
     except KeyboardInterrupt:
         print("Preparing for graceful shutdown...")
 
