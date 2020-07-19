@@ -16,6 +16,8 @@ class ThermSensor(Thread):
         displayName=None,
         interval=5,
         failedToReadThresh=20,
+        initialGoodValue=30,
+        maxNumOfSuppression=4,
         **kwargs
     ):
         self.stop_event = stop_event
@@ -23,11 +25,13 @@ class ThermSensor(Thread):
         self.sensor = sensor
         self.displayName = displayName
         self.interval = interval
+        self.maxNumOfSuppression = maxNumOfSuppression
 
         self.failedToReadThresh = failedToReadThresh
         self.sensor_failure_count = 0
 
         self.false_alarm_list = [[] for _ in sensor]
+        self.known_good_value = [initialGoodValue for _ in sensor]
 
         super().__init__(*args, **kwargs)
 
@@ -51,6 +55,7 @@ class ThermSensor(Thread):
 
                 if temp:
                     all_temp.append(temp)
+                    self.known_good_value[idx] = temp
 
             except Exception:
                 print(
@@ -58,12 +63,10 @@ class ThermSensor(Thread):
                 )
                 self.sensor_failure_count += 1
 
-        if all_temp:
-            return mean(all_temp)
-        elif self.sensor_failure_count >= self.failedToReadThresh:
+        if self.sensor_failure_count >= self.failedToReadThresh:
             return 255  # This will trigger the over-temperature protection for sure!
         else:
-            return None
+            return mean(all_temp)
 
     def cleanup(self):
         self.join()
@@ -74,13 +77,13 @@ class ThermSensor(Thread):
         # Ignore it for the first two consecutive '85.0'
         if temp == 85.0:
             self.false_alarm_list[idx].append(temp)
-            if len(self.false_alarm_list[idx]) > 2:
-                # We have received more than 2 consecutive '85.0', which means
-                # that we should spit out '85.0' faithfully.
+            if len(self.false_alarm_list[idx]) > self.maxNumOfSuppression:
+                # We should spit out '85.0' faithfully in case we read that
+                # repeatedly.
                 pass
             else:
                 # Suppress '85.0' on the basis that this is likely a fluke.
-                temp = None
+                temp = self.known_good_value[idx]
 
         else:
             self.false_alarm_list[idx] = []
