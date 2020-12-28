@@ -1,5 +1,10 @@
-{ stdenv, buildPythonPackage, fetchPypi
-, nose, twine, colorama }:
+{ stdenv
+, buildPythonPackage
+, fetchPypi
+, nose
+, twine
+, colorama
+}:
 
 buildPythonPackage rec {
   pname = "build_utils";

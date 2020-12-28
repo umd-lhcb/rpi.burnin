@@ -1,5 +1,9 @@
-{ stdenv, buildPythonPackage, fetchPypi
-, numpy, build_utils }:
+{ stdenv
+, buildPythonPackage
+, fetchPypi
+, numpy
+, build_utils
+}:
 
 buildPythonPackage rec {
   pname = "fake_rpi";

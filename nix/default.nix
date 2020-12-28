@@ -12,8 +12,8 @@ buildPythonPackage rec {
   src = builtins.path { path = ./..; name = pname; };
 
   propagatedBuildInputs = [ hidapi ]
-  ++ stdenv.lib.optionals (stdenv.isDarwin) [ fake_rpi ]
-  ++ stdenv.lib.optionals (!stdenv.isDarwin) [ RPi_GPIO ]
+    ++ stdenv.lib.optionals (stdenv.isDarwin) [ fake_rpi ]
+    ++ stdenv.lib.optionals (!stdenv.isDarwin) [ RPi_GPIO ]
   ;
 
   doCheck = false;
