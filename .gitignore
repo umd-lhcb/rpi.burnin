@@ -1,7 +1,4 @@
 *.pyc
-.python-version
-.virtualenv
 .DS_Store
-.envrc
 build
 dist
