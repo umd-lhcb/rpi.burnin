@@ -3,11 +3,15 @@ This library provides an interface from the various Raspberry Pi models for
 burn-in related activities.
 
 
-## Dependencies
-Install required packages with:
-```
-pip3 install --user -r ./requirements.txt
-```
+## Development
+- Install required packages with:
+    ```
+    pip3 install --user -r ./requirements.txt
+    ```
+- If you have `nix` with flake support installed:
+    ```
+    nix develop
+    ```
 
 
 ## Usage
@@ -137,8 +141,3 @@ where `t` is the number of seconds between each ON/OFF switch:
 ```
 which will initiate a loop where there is a 12 second pause between ON/OFF
 switches. Use Ctrl+C to exit.
-
-
-## Development
-In NixOS, run `nix-shell` in the root folder of this project. All needed
-dependencies should become available in that shell.
