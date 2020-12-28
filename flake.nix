@@ -25,7 +25,7 @@
         devShell = pkgs.mkShell {
           name = "rpi.burnin";
           buildInputs = with pythonPackages; [
-            pkgs.pythonPackages.rpi_burnin
+            rpi_burnin
           ]
           ++ stdenv.lib.optionals (stdenv.isx86_64) [
             # Python auto-complete
